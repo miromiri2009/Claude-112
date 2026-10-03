@@ -1,0 +1,603 @@
+<title>Ночная смена 112</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Unbounded:wght@600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: in-car dispatch terminal at 3 a.m. — clock-and-status strip on top, the scene as a console card, the shift notebook beside it. One deliberate night look, sodium-lamp orange for action, red only for lethal risk. */
+:root{
+  --night:#0c1015; --panel:#131a21; --panel2:#18212a; --line:#25303b;
+  --ink:#dde3e8; --dim:#8794a1; --sodium:#f0a04b; --sodium-ink:#1a1206;
+  --signal:#7fb2ec; --ok:#69c28f; --risk:#ef5b5b; --filter:#5b6672;
+  --f-display:"Unbounded","Arial Black",system-ui,sans-serif;
+  --f-body:"Golos Text","Segoe UI",system-ui,-apple-system,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{background:var(--night);color:var(--ink)}
+body{font:16px/1.55 var(--f-body);padding-inline:16px;padding-block:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--sodium);outline-offset:2px}
+
+.app{max-width:1120px;margin:0 auto;padding-block:14px 48px;display:grid;gap:14px}
+.hud{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--night);display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding-block:10px;border-bottom:1px solid var(--line)}
+.who{display:grid;line-height:1.15}
+.who b{font:700 15px/1.2 var(--f-display);letter-spacing:.01em}
+.who span{font:12px var(--f-mono);color:var(--dim)}
+.clock{font:600 26px/1 var(--f-mono);font-variant-numeric:tabular-nums;color:var(--sodium);margin-left:auto}
+.clock.slow{color:var(--signal)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;width:100%}
+.chip{font:12px/1 var(--f-mono);padding:6px 8px;border:1px solid var(--line);color:var(--dim);white-space:nowrap}
+.chip.on{color:var(--ink);border-color:var(--sodium)}
+.chip.bad{color:var(--risk);border-color:var(--risk)}
+.chip.good{color:var(--ok);border-color:var(--ok)}
+
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
+
+.scene{background:var(--panel);border:1px solid var(--line);padding:clamp(16px,3vw,28px);min-width:0;display:grid;gap:14px}
+.phase{font:600 11px/1 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--sodium)}
+.scene h2{font:700 clamp(20px,3vw,28px)/1.15 var(--f-display);margin:0;text-wrap:balance}
+.scene p{margin:0;max-width:66ch}
+.text{display:grid;gap:10px}
+.line{border-left:2px solid var(--line);padding-left:12px}
+.line.voice{border-color:var(--signal)}
+.line.voice .sp{color:var(--signal)}
+.line.vera .sp{color:var(--sodium)}
+.sp{font:600 12px/1.4 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;display:block;color:var(--dim)}
+.cut{font:600 13px var(--f-mono);color:var(--risk)}
+.card{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;border:1px dashed var(--filter);padding:10px 12px;font:13px/1.4 var(--f-mono);color:var(--dim)}
+.card b{color:var(--ink)}
+.stamp{border:1px solid var(--filter);color:var(--filter);padding:3px 6px;text-transform:uppercase;letter-spacing:.1em}
+
+.opts{display:grid;gap:8px}
+.opt{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:start;text-align:left;background:var(--panel2);border:1px solid var(--line);padding:11px 13px;cursor:pointer}
+.opt:hover{border-color:var(--sodium)}
+.opt .k{font:600 12px/1.6 var(--f-mono);color:var(--dim)}
+.opt .c{font:12px/1.6 var(--f-mono);color:var(--dim);white-space:nowrap}
+.opt.risk{border-color:color-mix(in srgb,var(--risk) 55%,var(--line))}
+.opt.risk .k{color:var(--risk)}
+.opt.ghost{opacity:.62}
+.opt:disabled{opacity:.38;cursor:default}
+.opt.primary{background:var(--sodium);color:var(--sodium-ink);border-color:var(--sodium)}
+.opt.primary .k,.opt.primary .c{color:var(--sodium-ink)}
+.result{background:var(--panel2);border-left:3px solid var(--sodium);padding:10px 14px}
+.result.bad{border-color:var(--risk)}
+.result.good{border-color:var(--ok)}
+.row{display:flex;flex-wrap:wrap;gap:8px}
+
+.room{position:relative;border:1px solid var(--line);background:var(--night)}
+.room svg{display:block;width:100%;height:auto}
+.room.focus{outline:2px solid var(--signal)}
+.hs{cursor:pointer}
+.hs circle.ring{fill:var(--signal);fill-opacity:.14;stroke:var(--signal);stroke-width:2}
+.hs{pointer-events:bounding-box}
+.hs text{pointer-events:all}
+.hs circle.dot{fill:var(--signal)}
+.hs.found circle.ring{stroke:var(--ok)} .hs.found circle.dot{fill:var(--ok)}
+.focusbar{height:6px;background:var(--line)}
+.focusbar i{display:block;height:100%;background:var(--signal);width:0}
+
+.note{background:var(--panel);border:1px solid var(--line);padding:16px;display:grid;gap:10px;align-content:start}
+.note h3{font:600 11px/1 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin:0}
+.note ol{margin:0;padding-left:18px;display:grid;gap:8px;font-size:14px}
+.note .empty{color:var(--dim);font-size:14px}
+.flags{display:flex;flex-wrap:wrap;gap:6px}
+.flag{font:11px/1 var(--f-mono);padding:5px 6px;background:var(--panel2);color:var(--dim)}
+
+.qte{position:fixed;inset:0;z-index:20;background:color-mix(in srgb,var(--night) 88%,transparent);display:grid;place-items:center;padding:16px}
+.qbox{background:var(--panel);border:2px solid var(--sodium);padding:22px;display:grid;gap:14px;justify-items:center;width:min(420px,100%)}
+.qbox.deadly{border:6px solid #000;box-shadow:0 0 0 2px var(--risk)}
+.qbox h4{margin:0;font:700 18px var(--f-display);text-align:center}
+.keys{display:flex;gap:10px}
+.key{width:58px;height:58px;display:grid;place-items:center;font:700 24px var(--f-mono);border:1px solid var(--line);background:var(--panel2);cursor:pointer}
+.key.done{background:var(--ok);color:var(--night);border-color:var(--ok)}
+.key.next{border-color:var(--sodium)}
+.qbar{width:100%;height:8px;background:var(--line)}
+.qbar i{display:block;height:100%;background:var(--sodium);width:100%}
+
+.black{position:fixed;inset:0;z-index:30;background:#000;color:#cfd6dc;display:grid;place-items:center;padding:24px;text-align:center}
+.black .big{font:700 clamp(20px,4vw,30px)/1.3 var(--f-display)}
+.black .sm{font:13px/1.6 var(--f-mono);color:#8794a1;margin-top:10px}
+
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+td,th{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font:600 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.tw{overflow-x:auto}
+.grade{font:700 64px/1 var(--f-display);color:var(--sodium)}
+label.set{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--dim)}
+label.set input{margin-top:4px;accent-color:var(--sodium)}
+.disc{border:1px solid var(--line);padding:14px;font-size:14px;color:var(--dim);display:grid;gap:8px}
+.disc b{color:var(--ink)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="app">
+  <div class="hud" id="hud"></div>
+  <div class="grid">
+    <section class="scene" id="scene" aria-live="polite"></section>
+    <aside class="note" id="note"></aside>
+  </div>
+</div>
+<div id="layer"></div>
+
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const START=3*3600+17*60; // 03:17:00
+
+const CLUES={
+  voice:{t:"Голос за дверью",d:"Мужчина говорит тихо и вежливо, на «вы»: «Света, откройте, пожалуйста»."},
+  wheels:{t:"Колёсики на записи",d:"Перед стуком на записи слышен дребезг маленьких колёс по плитке."},
+  van:{t:"Белый фургон",d:"У второго подъезда стоял белый фургон без номеров. Уехал без фар, когда вы свернули во двор."},
+  formalin:{t:"Запах формалина",d:"В лифте и у двери 117 пахнет формалином. Так пахнет в морге."},
+  liftwheels:{t:"Полосы в лифте",d:"На полу лифта две параллельные тёмные полосы: колёса каталки, а не чемодана."},
+  sanitar:{t:"«Санитар уже был»",d:"Парень на лестнице: «Час назад тут санитар катил каталку. Здоровый такой, в маске»."},
+  tea:{t:"Тёплый чай",d:"Чашка на столе ещё тёплая. Хозяйка ушла не больше двадцати минут назад."},
+  phone:{t:"Телефон под диваном",d:"Телефон Светланы под диваном. Не разряжен: его выключили вручную."},
+  blood:{t:"Кровь на косяке",d:"Капля крови на косяке на высоте около 190 см. Нападавший очень высокий и порезал руку."},
+  bloodfaint:{t:"Тёмное пятно на косяке",d:"Высоко на косяке тёмное пятно. Без фонаря не разобрать, что это."},
+  note:{t:"Записка «Б. — адвокат, среда»",d:"На холодильнике под магнитом: «Б. — адвокат, среда, 10:00». Света готовилась к чему-то официальному."},
+  ticket:{t:"Билет до Москвы",d:"Автобус Воронеж — Москва, завтра в 08:40. Купила сама. Или его подложили, чтобы было на что сослаться."},
+  tracks:{t:"Следы колёс на линолеуме",d:"От дивана к двери идут две параллельные полосы. Здесь катили каталку."},
+  wheeze:{t:"Хрип за стеной",d:"За стеной, в квартире 118, кто-то хрипит. Дверь соседа приоткрыта."},
+  cctv:{t:"Камера подъезда, 03:02",d:"Из лифта выходит очень высокий мужчина в халате санитара и медицинской маске. Катит каталку, накрытую простынёй. Лица не видно."}
+};
+
+let S;
+function fresh(){
+  return {hero:"kirill",t:0,pressure:false,slow:false,scene:"start",
+    noPressure:S?S.noPressure:false,bigQte:S?S.bigQte:false,
+    flags:{SVETA:"пропала",ARCHIVE:0,PETROV:0,VERA_TRUST:0,ERSHOVA:0,CITY:0,HARD:0,LITVIN_LIST:0},
+    clues:[],used:{},m:{firstGood:null,qGood:0,qTot:0,svcGood:0,svcBad:0,inGood:0,inBad:0},
+    police:null,policeFiltered:false,ambAt:null,ambCalledAt:null,fast:{f:0,a:0,s:0,t:0},pos:false,harm:0,
+    gear:[],route:null,loud:false,wounded:false,assessLeft:2,cams:false,lastRec:null,fork:null,fedor:null,
+    kirillDead:false,inherited:null,petrovCall:null,stepRoad:0,falseCall:false};
+}
+S=fresh();
+
+/* ---------- audio ---------- */
+let AC=null;
+function audio(){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume();}catch(e){AC=null}}
+function tone(freq,start,dur,vol){if(!AC)return;const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=freq;o.type="sine";g.gain.value=0;o.connect(g);g.connect(AC.destination);const t=AC.currentTime+start;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol||.08,t+.02);g.gain.setValueAtTime(vol||.08,t+dur-.03);g.gain.linearRampToValueAtTime(0,t+dur);o.start(t);o.stop(t+dur+.05)}
+function ring(){for(let i=0;i<2;i++)tone(425,i*2,1,.07)}
+function busy(n){for(let i=0;i<n;i++)tone(425,i*.7,.35,.06)}
+
+/* ---------- clock ---------- */
+function hhmmss(sec){const x=Math.round(START+sec);const h=Math.floor(x/3600)%24,m=Math.floor(x%3600/60),s=x%60;return String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")+":"+String(s).padStart(2,"0")}
+function hhmm(sec){return hhmmss(sec).slice(0,5)}
+function spend(sec){S.t+=sec;hud()}
+setInterval(()=>{if(S.pressure&&!S.noPressure){S.t+=S.slow?0.2:1;hud()}},1000);
+
+/* ---------- notebook & hud ---------- */
+function clue(id){if(!S.clues.includes(id)){S.clues.push(id);note();hud();return true}return false}
+function has(id){return S.clues.includes(id)}
+function realClues(){return S.clues.filter(c=>c!=="bloodfaint").length}
+function hud(){
+  const hero=S.hero==="kirill"?["Кирилл Ветров","координатор МК-112 · 34"]:["Павел Литвин","врач реанимационной бригады · 50"];
+  const chips=[];
+  if(S.scene!=="start"){
+    if(S.police!=null)chips.push(`<span class="chip ${S.t>=S.police?"good":"on"}">Полиция: ${S.t>=S.police?"на месте":"к "+hhmm(S.police)}</span>`);
+    else chips.push(`<span class="chip ${S.policeFiltered?"bad":""}">Полиция: ${S.policeFiltered?"карточка в «Фильтре»":"не вызвана"}</span>`);
+    if(S.ambAt!=null)chips.push(`<span class="chip ${S.t>=S.ambAt?"good":"on"}">Скорая: ${S.t>=S.ambAt?"на месте":"к "+hhmm(S.ambAt)}</span>`);
+    if(["fedor","apartment"].includes(S.scene)&&S.fedor==null)chips.push(`<span class="chip ${S.t>(S.hero==="kirill"?840:1140)?"bad":"on"}">Окно для тромболизиса: до ${S.hero==="kirill"?"03:31":"03:36"}</span>`);
+    chips.push(`<span class="chip">Улики: ${realClues()}</span>`);
+    if(S.wounded)chips.push(`<span class="chip bad">Ранен</span>`);
+    if(S.noPressure)chips.push(`<span class="chip">Время на паузе между действиями</span>`);
+  }
+  $("#hud").innerHTML=`<div class="who"><b>${hero[0]}</b><span>${hero[1]}</span></div>
+    <div class="clock ${S.slow?"slow":""}" aria-label="Время смены">${hhmmss(S.t)}</div>
+    ${chips.length?`<div class="chips">${chips.join("")}</div>`:""}`;
+}
+function note(){
+  const items=S.clues.map(id=>`<li><b>${esc(CLUES[id].t)}.</b> ${esc(CLUES[id].d)}</li>`).join("");
+  const f=S.flags;
+  const flags=[["Светлана",f.SVETA],["Архив 112",f.ARCHIVE],["Петров",f.PETROV>=1?"подозревается":f.PETROV>0?"тень":"—"],["Доверие Веры",f.VERA_TRUST],["Ершова",f.ERSHOVA?"в курсе":"—"]];
+  $("#note").innerHTML=`<h3>Блокнот смены${S.hero==="litvin"?" · наследство":""}</h3>
+    ${items?`<ol>${items}</ol>`:`<p class="empty">Пока пусто. Улики из звонка, дороги и квартиры будут записываться сюда.</p>`}
+    ${S.inherited?`<p class="empty">${esc(S.inherited)}</p>`:""}
+    <h3>Сюжетные флаги</h3><div class="flags">${flags.map(x=>`<span class="flag">${x[0]}: ${esc(x[1])}</span>`).join("")}</div>`;
+}
+
+/* ---------- scene helpers ---------- */
+function render(phase,title,body,opts){
+  const el=$("#scene");
+  el.innerHTML=`<div class="phase">${phase}</div><h2>${title}</h2><div class="text">${body}</div><div class="opts" id="opts"></div>`;
+  const box=$("#opts");
+  (opts||[]).forEach((o,i)=>{
+    const b=document.createElement("button");
+    b.className="opt"+(o.risk?" risk":"")+(o.primary?" primary":"")+(o.ghost?" ghost":"");
+    b.type="button";
+    if(o.disabled)b.disabled=true;
+    b.innerHTML=`<span class="k">${o.risk?"✝":o.primary?"→":String(i+1)}</span><span>${o.label}${o.sub?`<br><small style="color:var(--dim)">${o.sub}</small>`:""}</span><span class="c">${o.cost?"+"+fmtCost(o.cost):""}</span>`;
+    b.addEventListener("click",()=>{if(o.cost)spend(o.cost);o.act(b)});
+    box.appendChild(b);
+  });
+  hud();note();
+  const first=box.querySelector("button:not([disabled])");
+  if(first&&document.activeElement&&document.activeElement.classList.contains("opt"))first.focus();
+}
+function fmtCost(s){return s>=60?Math.round(s/60)+" мин":s+" с"}
+function result(html,kind){const d=document.createElement("div");d.className="result "+(kind||"");d.innerHTML=html;$("#scene .text").appendChild(d)}
+function go(name){S.scene=name;S.slow=false;SCENES[name]();window.scrollTo({top:0,behavior:"auto"})}
+
+/* ---------- QTE ---------- */
+function qte(title,n,base,deadly,done){
+  const arrows=["←","↑","→","↓"],codes=["ArrowLeft","ArrowUp","ArrowRight","ArrowDown"];
+  const seq=Array.from({length:n},()=>Math.floor(Math.random()*4));
+  const win=(base*(S.bigQte?2:1))*1000;let i=0,over=false;const t0=performance.now();
+  const L=$("#layer");
+  L.innerHTML=`<div class="qte" role="dialog" aria-label="Быстрое действие"><div class="qbox ${deadly?"deadly":""}">
+    <h4>${title}</h4><div class="keys">${seq.map((k,j)=>`<button type="button" class="key" data-j="${j}" aria-label="${["влево","вверх","вправо","вниз"][k]}">${arrows[k]}</button>`).join("")}</div>
+    <div class="qbar"><i id="qb"></i></div><div style="font:12px var(--f-mono);color:var(--dim)">Стрелки на клавиатуре или кнопки по порядку${deadly?" · ошибка может стоить жизни":""}</div></div></div>`;
+  const keys=[...L.querySelectorAll(".key")];
+  function paint(){keys.forEach((k,j)=>{k.classList.toggle("done",j<i);k.classList.toggle("next",j===i)})}
+  paint();
+  function press(dir){if(over)return;if(dir===seq[i]){i++;paint();if(i===n)finish(true)}else finish(false)}
+  function key(e){const d=codes.indexOf(e.key);if(d>=0){e.preventDefault();press(d)}}
+  keys.forEach((k,j)=>k.addEventListener("click",()=>{press(seq[j]===seq[i]&&j===i?seq[i]:-1)}));
+  document.addEventListener("keydown",key);
+  (function tick(){if(over)return;const p=1-(performance.now()-t0)/win;const b=$("#qb");if(b)b.style.width=Math.max(0,p*100)+"%";if(p<=0)finish(false);else requestAnimationFrame(tick)})();
+  function finish(ok){if(over)return;over=true;document.removeEventListener("keydown",key);setTimeout(()=>{L.innerHTML="";done(ok)},ok?250:450)}
+}
+
+/* ---------- black screens ---------- */
+function black(lines,ms,then){
+  const L=$("#layer");let k=0;
+  function show(){L.innerHTML=`<div class="black" role="dialog"><div>${lines[k]}</div></div>`;k++;if(k<lines.length)setTimeout(show,ms);else setTimeout(()=>{L.innerHTML="";then()},ms)}
+  show();
+}
+function silence(then){
+  audio();busy(6);
+  black([`<div class="big">Минута тишины</div><div class="sm">10 секунд. Гудки.</div>`],10000,then);
+}
+
+/* =================== SCENES =================== */
+const SCENES={};
+
+SCENES.start=()=>{
+  S.pressure=false;
+  render("Прототип · миссия 1.4","Ночная смена",`
+    <p>Вы — оперативный координатор пилота МК-112 в Воронеже. Ночью вы первым приезжаете туда, где человеку хуже всего, вызываете службы и до их приезда помогаете сами.</p>
+    <div class="disc"><b>18+. Все события вымышлены. Реальные службы, люди и организации не имеют отношения к сюжету. Совпадения случайны.</b>
+    <span>В миссии есть насилие, похищение человека и угроза смерти. Если вам сейчас тяжело, звоните 112 или на телефон доверия 8-800-2000-122 (бесплатно, круглосуточно).</span></div>
+    <p>Часы вверху идут во время звонка и помощи пострадавшему. Варианты с ✝ могут стоить герою жизни. Правильного ответа в развилке нет.</p>
+    <label class="set"><input type="checkbox" id="opt-time" ${S.noPressure?"checked":""}> Без давления времени: часы двигаются только от ваших действий.</label>
+    <label class="set"><input type="checkbox" id="opt-qte" ${S.bigQte?"checked":""}> Увеличенные окна быстрых действий (в 2 раза дольше).</label>`,
+  [{label:"Заступить на смену",primary:true,act(){S.noPressure=$("#opt-time").checked;S.bigQte=$("#opt-qte").checked;audio();go("brief")}}]);
+};
+
+SCENES.brief=()=>{
+  render("День 2 · 03:17","Кольцовский сквер",`
+    <p>Мокрый снег. Машина МК-112 стоит у Кольцовского сквера после ложного вызова. Водитель Лёня Ковальчук дремлет, натянув шапку на глаза. В бардачке лежит фляжка, которую вы не трогали уже неделю.</p>
+    <p>Рация оживает. Голос старшего диспетчера Веры Соколовой:</p>
+    <div class="line vera"><span class="sp">Вера · ЕДДС</span>«Мобильный-один, срочный. Соединяю напрямую, слушай сам».</div>`,
+  [{label:"Принять вызов",primary:true,act(){ring();go("call")}}]);
+};
+
+SCENES.call=()=>{
+  const lines=[
+    ["voice","Светлана","«Алло… сто двенадцать? Это Света. Орлова. Димитрова… квартира сто семнадцать, восьмой этаж…»"],
+    ["voice","Светлана","«Он пришёл. Он у двери. Он… такой вежливый…»"],
+    ["voice","Светлана","«Говорит: „Света, откройте, пожалуйста“. Я не открою. Я в среду… я всё…»"],
+    ["cut","","Стук. Дребезг. Обрыв. Длительность звонка 0:41."],
+    ["vera","Вера · ЕДДС","«Обрыв на сорок первой секунде. И, Кирилл… карточка уже серая. „Фильтр“ поставил „повтор“. Повтор чего — не понимаю»."]
+  ];
+  render("Ф1 · Звонок","Квартира 117",`<div id="tr"></div>`,[{label:"Пропустить запись",ghost:true,act(){showAll()}}]);
+  let k=0,timer=null;
+  function line(l){return l[0]==="cut"?`<p class="cut">${l[2]}</p>`:`<div class="line ${l[0]}"><span class="sp">${l[1]}</span>${l[2]}</div>`}
+  function step(){if(k>=lines.length)return done();$("#tr").insertAdjacentHTML("beforeend",line(lines[k]));if(lines[k][0]==="cut")busy(3);k++;timer=setTimeout(step,1700)}
+  function showAll(){clearTimeout(timer);$("#tr").innerHTML=lines.map(line).join("");k=lines.length;done()}
+  function done(){
+    $("#tr").insertAdjacentHTML("beforeend",`<div class="card"><span>Карточка №4471 · Димитрова, 117</span><span class="stamp">повтор</span><span>пометил: <b>Фильтр приоритетов</b></span></div>`);
+    S.pressure=true;callOpts();
+  }
+  step();
+};
+function good(){if(S.m.firstGood==null)S.m.firstGood=S.t;S.m.qGood++;S.m.qTot++}
+function bad(){S.m.qTot++}
+function callOpts(){
+  const U=S.used;
+  const o=[
+    {id:"replay",label:"«Вера, прокрути запись ещё раз»",cost:20,act(){good();U.replay=1;clue("voice");clue("wheels");callOpts();result("Вера прокручивает. Мужской голос тихий и вежливый. Перед стуком дребезжат маленькие колёса.")}},
+    {id:"recall",label:"«Перезвони ей»",cost:15,act(){good();U.recall=1;callOpts();result("«Абонент недоступен». Телефон не сел — его выключили.")}},
+    {id:"manual",label:"«Отправь нас и полицию вручную, мимо „Фильтра“, под твою подпись»",cost:10,act(){good();U.manual=1;S.police=S.t+15*60;S.policeFiltered=false;S.flags.VERA_TRUST++;S.m.svcGood+=2;callOpts();result("«Под мою подпись. Наряд будет минут через девять после вас. Громову утром объясню сама».","good")}},
+    {id:"filter",label:"«Отправь полицию обычным порядком»",cost:10,act(){bad();U.filter=1;if(S.police==null)S.policeFiltered=true;S.m.svcBad++;callOpts();result("Карточка уходит наряду и через секунду снова становится серой. Наряд её не увидит.","bad")}},
+    {id:"billing",label:"«Запроси биллинг её номера»",cost:30,act(){bad();U.billing=1;S.flags.ERSHOVA=1;S.m.svcBad++;callOpts();result("«Нужна санкция прокурора. Куратор пилота — Ершова. В три утра она подпишет только отказ». Утром Ершова узнает, что вы интересовались этим номером.","bad")}},
+    {id:"save",label:"«Скинь мне запись на телефон»",cost:10,act(){good();U.save=1;S.flags.ARCHIVE++;callOpts();result("«Скинула. Если „Фильтр“ её съест, у тебя останется копия». Первый фрагмент «Архива 112».","good")}},
+    {id:"false",label:"«Закрывай как ложный. Девушка перебрала»",cost:0,act(){U.falseAsk=1;callOpts()}}
+  ];
+  const opts=o.filter(x=>!U[x.id]).map(x=>x.id==="false"&&U.falseAsk?{label:"Да, закрыть вызов как ложный",risk:false,ghost:true,act(){S.falseCall=true;S.pressure=false;go("falseEnd")}}:x);
+  if(U.falseAsk)opts.push({label:"Нет, едем",ghost:true,act(){U.falseAsk=0;callOpts()}});
+  opts.push({label:"Выезжаем",primary:true,act(){S.pressure=false;if(!U.manual&&!U.filter&&S.police==null)S.policeFiltered=false;go("road")}});
+  const box=$("#opts");box.innerHTML="";
+  opts.forEach((x,i)=>{const b=document.createElement("button");b.type="button";b.className="opt"+(x.primary?" primary":"")+(x.ghost?" ghost":"");
+    b.innerHTML=`<span class="k">${x.primary?"→":i+1}</span><span>${x.label}</span><span class="c">${x.cost?"+"+fmtCost(x.cost):""}</span>`;
+    b.addEventListener("click",()=>{if(x.cost)spend(x.cost);x.act()});box.appendChild(b)});
+  hud();
+}
+
+SCENES.falseEnd=()=>{
+  S.fedor="умер";S.flags.SVETA="пропала";S.flags.CITY-=10;
+  render("Ф6 · Отчёт","Вызов закрыт как ложный",`
+    <p>Вы возвращаетесь к скверу. Лёня снова засыпает. Через двое суток в главе 2 придёт сообщение: тело Светланы Орловой найдено у водохранилища.</p>
+    <p>Сосед Светланы, Фёдор Ильич Кравец, 84 года, в ту ночь лежал в приоткрытой двери с инсультом. К нему никто не приехал.</p>`,
+  [{label:"Отчёт смены",primary:true,act(){go("report")}}]);
+};
+
+SCENES.road=()=>{
+  const st=S.stepRoad;
+  if(st===0){
+    render("Ф2 · Дорога","Кольцовский сквер → ул. Димитрова",`
+      <p>Ночной город пустой. До Левобережья — через Чернавский мост, потом Ленинский проспект и Димитрова. Лёня уже проснулся и держит руль обеими руками.</p>`,
+    [{label:"Сирена до Чернавского моста, дальше тихо",sub:"Двор не узнает о вас заранее",act(){S.route="quiet";spend(360);S.stepRoad=1;go("road")}},
+     {label:"Сирена до самого подъезда",sub:"Быстрее на полминуты",act(){S.route="loud";S.loud=true;spend(330);S.stepRoad=1;go("road")}},
+     {label:"Через Вогрэсовский мост, там свободнее",sub:"Без гололёда, но дольше",act(){S.route="vogres";spend(480);S.stepRoad=2;go("road")}}]);
+  }else if(st===1){
+    render("Ф2 · Дорога","Чернавский мост",`<p>На спуске с моста гололёд. Фура впереди начинает складываться поперёк полосы.</p>`,
+    [{label:"Увернуться",primary:true,act(){qte("Фура складывается. Увести машину",2,2.2,false,ok=>{if(!ok){spend(60);S.stepRoad=2;go("road");result("Машину разворачивает, вы цепляете отбойник. Лёня: «Живы. Едем». Потеряна минута.","bad")}else{S.stepRoad=2;go("road");result("Лёня проходит в полуметре от прицепа. «Ну ты даёшь», — говорит он вам, хотя рулил сам.","good")}})}}]);
+  }else if(st===2){
+    S.gear=[];
+    renderGear();
+  }else{
+    const extra=S.loud?"<p>Во дворе в нескольких окнах зажигается свет. Сирену слышал весь дом.</p>":"";
+    if(!S.loud&&S.route!=="vogres")clue("van");
+    render("Ф2 · Подъезд","Димитрова, восьмой этаж",`
+      ${extra}${has("van")?"<p>У второго подъезда трогается белый фургон без номеров. Уезжает без фар.</p>":""}
+      <p>Консьерж спит в будке. Лифт стоит на первом этаже.</p>
+      <div class="line"><span class="sp">Лёня</span>«Лифт или ногами?»</div>`,
+    [{label:"Лифт",sub:"Быстрее",cost:40,act(){clue("formalin");clue("liftwheels");go("apartment")}},
+     {label:"Пешком по лестнице",sub:"Видно, кто есть на этажах",cost:120,act(){go("stairs")}}]);
+  }
+};
+function renderGear(){
+  const G=[["kit","Аптечка","Перевязка, тонометр, глюкометр"],["vest","Бронежилет","Тяжёлый. Спасает от ножа"],["torch","Фонарь","Видно то, что в темноте сливается"],["rec","Диктофон","Запишет любой разговор"]];
+  render("Ф2 · Подготовка","Что взять из машины",`<p>Руки две. Выберите два предмета. Выбрано: ${S.gear.length?S.gear.map(g=>G.find(x=>x[0]===g)[1]).join(", "):"ничего"}.</p>`,
+  G.map(g=>({label:g[1],sub:g[2],disabled:S.gear.includes(g[0])||S.gear.length>=2,act(){S.gear.push(g[0]);if(S.gear.length>=2){S.stepRoad=3;go("road")}else renderGear()}})));
+}
+
+SCENES.stairs=()=>{
+  render("Ф2 · Лестница","Пятый этаж",`
+    <p>На площадке пятого этажа, под разбитой лампой, сидит парень в капюшоне. Зрачки во всю радужку. Нож-бабочка щёлкает в пальцах.</p>
+    <div class="line"><span class="sp">Парень</span>«Стой. Деньги давай. Быстро».</div>`,
+  [{label:"Отдать кошелёк",cost:20,act(){go("apartment");result("Он хватает кошелёк и убегает вниз.")}},
+   {label:"«Я из сто двенадцать. Наверху человеку плохо. Пропусти»",risk:true,act(){
+      result("Он моргает: «Там санитар уже был. С каталкой. Час назад. Ты тоже санитар?» И тут же бросается вперёд.");clue("sanitar");S.flags.PETROV=Math.max(S.flags.PETROV,0.5);
+      setTimeout(fight,900)}},
+   {label:"Рвануть мимо",risk:true,act:fight}]);
+  function fight(){qte("Нож. Перехватить руку",3,1.6,true,ok=>{
+    if(ok){spend(30);go("apartment");result("Вы выкручиваете ему руку. Нож летит в пролёт. Парень убегает вниз, держась за запястье.","good")}
+    else if(S.gear.includes("vest")){S.wounded=true;spend(60);go("apartment");result("Удар приходится в бронежилет и уходит в бок. Порез под рёбрами, кровь, но вы на ногах. Парень убегает.","bad")}
+    else{S.kirillDead=true;S.pressure=false;go("death")}
+  })}
+};
+
+SCENES.apartment=()=>{
+  S.pressure=true;
+  const torch=S.gear.includes("torch");
+  const spots=[
+    {id:torch?"blood":"bloodfaint",x:82,y:70,label:"косяк"},
+    {id:"formalin",x:60,y:250,label:"у двери"},
+    {id:"phone",x:300,y:300,label:"под диваном"},
+    {id:"tea",x:440,y:160,label:"чашка"},
+    {id:"note",x:555,y:95,label:"холодильник"},
+    {id:"ticket",x:525,y:212,label:"билет"},
+    {id:"tracks",x:170,y:312,label:"пол"},
+    {id:"wheeze",x:565,y:265,label:"стена кв. 118"}
+  ];
+  render("Ф3 · Прибытие","Квартира 117",`
+    <p>Дверь приоткрыта. Свет горит. На столе чашка, телевизор выключен. Тишина такая, что слышно, как гудит холодильник. И ещё что-то за стеной.</p>
+    <div class="room" id="room"><svg viewBox="0 0 600 340" role="img" aria-label="План квартиры 117">
+      <rect x="0" y="0" width="600" height="340" fill="var(--night)"/>
+      <rect x="30" y="20" width="550" height="300" fill="var(--panel2)" stroke="var(--line)" stroke-width="3"/>
+      <rect x="30" y="40" width="8" height="230" fill="var(--line)"/>
+      <rect x="38" y="40" width="60" height="230" fill="none" stroke="var(--dim)" stroke-dasharray="4 4"/>
+      <text x="44" y="290" fill="var(--dim)" font-family="JetBrains Mono, monospace" font-size="11">дверь</text>
+      <rect x="200" y="225" width="190" height="60" rx="6" fill="var(--line)"/>
+      <text x="262" y="260" fill="var(--dim)" font-family="JetBrains Mono, monospace" font-size="11">диван</text>
+      <rect x="430" y="150" width="120" height="70" fill="var(--line)"/>
+      <rect x="530" y="40" width="45" height="90" fill="var(--line)"/>
+      <rect x="200" y="30" width="140" height="10" fill="var(--signal)" opacity=".35"/>
+      <text x="236" y="58" fill="var(--dim)" font-family="JetBrains Mono, monospace" font-size="11">окно</text>
+      <g id="spots"></g>
+    </svg><div class="focusbar"><i id="fb"></i></div></div>
+    <p id="hint" style="font:13px var(--f-mono);color:var(--dim)">«Оценка» замедляет время и подсвечивает детали. Осталось использований: ${S.assessLeft}.</p>`,
+  apOpts());
+  const g=$("#spots");
+  spots.forEach(s=>{
+    const el=document.createElementNS("http://www.w3.org/2000/svg","g");
+    el.setAttribute("class","hs"+(has(s.id)?" found":""));el.setAttribute("tabindex","0");el.setAttribute("role","button");el.setAttribute("aria-label",s.label);
+    el.innerHTML=`<circle class="ring" cx="${s.x}" cy="${s.y}" r="22"/><circle class="dot" cx="${s.x}" cy="${s.y}" r="4"/><text x="${s.x>480?s.x-26:s.x+26}" text-anchor="${s.x>480?"end":"start"}" y="${s.y+4}" fill="var(--signal)" font-family="JetBrains Mono, monospace" font-size="11">${s.label}</text>`;
+    el.style.display=(has(s.id)||S.fullLook)?"":"none";el.dataset.id=s.id;
+    const pick=()=>{if(clue(s.id)){el.classList.add("found");result(`<b>${esc(CLUES[s.id].t)}.</b> ${esc(CLUES[s.id].d)}`);}};
+    el.addEventListener("click",pick);el.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();pick()}});
+    g.appendChild(el);
+  });
+};
+function apOpts(){
+  const o=[];
+  if(S.assessLeft>0&&!S.fullLook)o.push({label:`«Оценка»: замедлить время на 8 секунд`,primary:true,act(){assess()}});
+  o.push({label:"Иду к соседу. Лёня — к консьержу, пусть покажет камеры",sub:has("wheeze")?"Хрип за стеной слышен отчётливо":"Лёня: «Кирилл, за стеной кто-то хрипит»",act(){S.cams=true;go("fedor")}});
+  o.push({label:"Иду к соседу. Лёня, со мной",act(){go("fedor")}});
+  if(!S.fullLook)o.push({label:"Сначала досмотрю квартиру до конца",sub:"Все детали станут видны",cost:180,act(){S.fullLook=true;go("apartment");result("Вы методично проходите комнату. Все детали на виду. Хрип за стеной стал реже.")}});
+  return o;
+}
+function assess(){
+  if(S.assessLeft<=0)return;S.assessLeft--;S.slow=true;hud();
+  $("#room").classList.add("focus");
+  document.querySelectorAll(".hs").forEach(h=>h.style.display="");
+  const fb=$("#fb"),t0=performance.now(),D=8000;
+  const btn=$("#opts .primary");if(btn)btn.disabled=true;
+  (function tick(){const p=(performance.now()-t0)/D;if(fb)fb.style.width=Math.min(100,p*100)+"%";if(p<1&&S.scene==="apartment")requestAnimationFrame(tick);else end()})();
+  function end(){S.slow=false;hud();const r=$("#room");if(!r)return;r.classList.remove("focus");
+    document.querySelectorAll(".hs").forEach(h=>{if(!h.classList.contains("found"))h.style.display="none"});
+    const hint=$("#hint");if(hint)hint.textContent=`«Оценка» закончилась. Осталось использований: ${S.assessLeft}.`;
+    if(btn){if(S.assessLeft>0)btn.disabled=false;else btn.remove()}}
+}
+
+/* ---------- Ф4: Фёдор ---------- */
+SCENES.fedor=()=>{
+  S.pressure=true;
+  const L=S.hero==="litvin";
+  const intro=L?`<p>Кв. 118. Фёдор Ильич Кравец, 84 года, на полу в прихожей. Ваш «Прогноз» уже считает.</p>
+    <div class="card"><span>«Прогноз»: выживание</span><b style="font-size:20px;color:var(--ink)">9 %</b><span>— так видите вы.</span><span style="color:var(--dim)">По данным: 47 %</span></div>
+    <p style="color:var(--dim);font-size:14px">Белая цифра — то, что видит уставший Литвин. Серая — реальная. Игрок видит обе, герой только первую.</p>`
+   :`<p>Кв. 118. Дверь нараспашку. Фёдор Ильич Кравец, 84 года, сидит на полу в прихожей, привалившись к обувнице. В комнате бормочет телевизор. Пахнет корвалолом.</p>
+    <div class="line"><span class="sp">Фёдор Ильич</span>«Сынок… я… ноги не… »</div>`;
+  render("Ф4 · Ядро",L?"Фёдор Ильич, глазами врача":"Фёдор Ильич",intro,fedorOpts());
+};
+function fedorOpts(){
+  const U=S.used,L=S.hero==="litvin";
+  const add=(id,o)=>{if(!U["f_"+id])list.push(Object.assign(o,{act0:o.act,act(){U["f_"+id]=1;o.act0();rerender()}}))};
+  const list=[];
+  add("smile",{label:"«Фёдор Ильич, улыбнитесь мне»",cost:20,act(){S.fast.f=1;S.m.inGood++;result("Левый угол рта не поднимается. Лицо перекошено.")}});
+  add("arms",{label:"«Поднимите обе руки и подержите»",cost:20,act(){S.fast.a=1;S.m.inGood++;result("Правая рука медленно опускается.")}});
+  add("speech",{label:"«Повторите: „Сегодня ночью идёт снег“»",cost:20,act(){S.fast.s=1;S.m.inGood++;result("Слова плывут: «Седня… нчью… снх…»")}});
+  add("time",{label:"«Когда стало плохо? Что шло по телевизору?»",cost:30,act(){S.fast.t=1;S.m.inGood++;result("Он показывает на телевизор: «…новости… в три…». Время начала около 03:00. Вы записываете его ручкой на тыльной стороне ладони.","good")}});
+  add("pos",{label:"Уложить, приподнять голову на 30°, расстегнуть ворот, не давать вставать",cost:30,act(){S.pos=true;S.m.inGood++;result("Вы подкладываете куртку под плечи. Он дышит ровнее.","good")}});
+  add("water",{label:"Дать воды и таблетку аспирина",cost:20,act(){S.harm++;S.m.inBad++;result("Он давится. Глотание нарушено, вода идёт не в то горло. Кашель, хрип. Аспирин при неясном инсульте давать нельзя.","bad")}});
+  add("ammonia",{label:"Усадить в кресло, дать нашатырь, растереть уши",cost:20,act(){S.harm++;S.m.inBad++;result("Он заваливается набок в кресле. При инсульте человека не сажают и не тормошат.","bad")}});
+  if(!L)add("call",{label:"Вызвать скорую: «Инсульт, начало около 03:00, Димитрова, сто восемнадцать»",cost:15,act(){S.ambCalledAt=S.t;S.ambAt=S.t+420;S.m.svcGood++;result(`Вера: «Реанимационная бригада, семь минут». ${S.fast.t?"":"Время начала инсульта вы не назвали: врачам придётся гадать."}`,"good")}});
+  add("relatives",{label:"Позвонить родным",cost:40,act(){result("Дочь в Липецке. Не берёт трубку.")}});
+  if(L){
+    list.push({label:"Грузим в машину. Тромболизис, сирена",primary:true,act(){S.ambCalledAt=S.t;fedorOutcome();go("petrovCall")}});
+    list.push({label:"Отпустить",sub:"Белая цифра ниже 15 %. Этот вариант всегда есть у Литвина",ghost:true,act(){release()}});
+  }else if(S.ambAt!=null){
+    list.push({label:"Держать его за руку до приезда бригады",primary:true,act(){S.pressure=false;if(S.t<S.ambAt)S.t=S.ambAt;fedorOutcome();go("arrival")}});
+  }
+  function rerender(){const b=$("#opts");if(!b)return;b.innerHTML="";const nl=fedorOpts();nl.forEach((x,i)=>{const e=document.createElement("button");e.type="button";e.className="opt"+(x.primary?" primary":"")+(x.ghost?" ghost":"")+(x.risk?" risk":"");e.innerHTML=`<span class="k">${x.primary?"→":i+1}</span><span>${x.label}${x.sub?`<br><small style="color:var(--dim)">${x.sub}</small>`:""}</span><span class="c">${x.cost?"+"+fmtCost(x.cost):""}</span>`;e.addEventListener("click",()=>{if(x.cost)spend(x.cost);x.act()});b.appendChild(e)});hud()}
+  return list;
+}
+function release(){
+  S.pressure=false;
+  render("Ф4 · Ядро","Отпустить?",`<p>Шприц в нагрудном кармане. Белая цифра — 9 %. Вы делали это четырнадцать раз и каждый раз называли это милосердием.</p><p style="color:var(--dim)">Серая цифра — 47 %. Её видите только вы, игрок.</p>`,
+  [{label:"Ввести",ghost:true,act(){S.fedor="умер (Литвин)";S.flags.LITVIN_LIST++;S.flags.HARD+=30;black([`<div class="big">Фёдор Ильич перестаёт хрипеть.</div><div class="sm">Литвин протирает очки. «Цифры не врут».</div>`],3500,()=>go("petrovCall"))}},
+   {label:"Нет. Работать",primary:true,act(){S.pressure=true;go("fedor")}}]);
+}
+function fedorOutcome(){
+  const L=S.hero==="litvin";const fast=S.fast.f+S.fast.a+S.fast.s;const tc=S.ambCalledAt;
+  const tFull=L?1140:840,tPart=L?1500:1260;
+  let tier=(tc<=tFull&&S.fast.t&&fast>=2)?2:(tc<=tPart?1:0);
+  if(!S.pos&&tier===2)tier=1;
+  tier=Math.max(0,tier-S.harm);
+  S.fedor=["умер в реанимации","жив, речь не восстановится полностью","жив, тромболизис успели"][tier];
+}
+
+SCENES.arrival=()=>{
+  const cams=S.cams?(clue("cctv"),S.flags.PETROV=Math.max(S.flags.PETROV,1),`<div class="line"><span class="sp">Лёня</span>«Кирилл, глянь, что у консьержа на записи». ${esc(CLUES.cctv.d)}</div>`):"";
+  render("Ф4 · Бригада","Реанимация на пороге",`
+    <p>Бригада поднимается с носилками. Врач, Павел Литвин, сухой и аккуратный, протирает очки, глядя на Фёдора Ильича. Вам кажется, что он что-то подсчитывает.</p>
+    <div class="line"><span class="sp">Литвин</span>«Ветров? ${S.fast.t?"Время начала записали? Хорошо.":"Время начала не знаете? Плохо."} Повезём на тромболизис».</div>
+    <p>У двери 117 он задерживается и принюхивается: «Формалин. Странно. Как у нас в морге».</p>${cams}`,
+  [{label:"Выйти на лестничную площадку",primary:true,act(){go("fork")}}]);
+};
+
+/* ---------- смерть и передача смены ---------- */
+SCENES.death=()=>{
+  black([`<div class="big">Удар приходится под рёбра.</div><div class="sm">Звук уходит. Остаётся гул.</div>`,
+         `<div class="big">Склад, 2019. За минуту до.</div><div class="sm">Денис: «Кир, давай подождём разведку».<br>Вы: «Там человек кричит».</div>`],3200,()=>{
+    render("Последняя запись","Пятнадцать секунд",`<p>Рация в руке. Вы успеете сказать одну фразу.</p>`,
+    [{label:"«Оля, прости»",act(){S.lastRec="olga";end()}},
+     {label:"«Вера, это не ложный. Квартира сто семнадцать»",act(){S.lastRec="vera";end()}},
+     {label:"Промолчать",act(){S.lastRec="none";end()}}]);
+  });
+  function end(){audio();busy(5);black([`<div class="big">Кирилл Андреевич Ветров</div><div class="sm">34 года · координатор МК-112 · смена «Б»</div>`],3500,()=>silence(()=>go("handoff")))}
+};
+SCENES.handoff=()=>{
+  const heroes=[["Кирилл Ветров","погиб"],["Павел Литвин","доступен"],["Вера Соколова","дебют в 2.1"],["Алина Морозова","дебют в 2.5"],["Артём Кольцов","дебют в 3.1"],["Сергей Громов","дебют в 3.4"],["Ольга Ветрова","дебют в 4.1"],["Геннадий Петров","дебют в 4.2"],["Тамара Ершова","дебют в 5.1"]];
+  render("Передача смены","Смену принимает следующий",`
+    <div class="tw"><table><tr><th>№</th><th>Герой</th><th>Статус</th></tr>${heroes.map((h,i)=>`<tr><td>${i+1}</td><td>${h[0]}</td><td style="color:${h[1]==="погиб"?"var(--risk)":h[1]==="доступен"?"var(--ok)":"var(--dim)"}">${h[1]}</td></tr>`).join("")}</table></div>
+    <p>Сюжет не откатывается. Мир помнит, что вы сделали. Наследник получит часть блокнота и часы Дениса Шарова.</p>`,
+  [{label:"Принять смену: Павел Литвин",primary:true,act(){inherit();go("litvin")}}]);
+};
+function inherit(){
+  const pool=S.clues.filter(c=>c!=="bloodfaint");
+  const keep=pool.length?pool[Math.floor(Math.random()*pool.length)]:null;
+  S.inherited=`Наследство: блокнот Ветрова, страницы залиты кровью — читается одна запись из ${pool.length||0}. Часы Дениса Шарова, отстают на 4 минуты.`;
+  S.clues=keep?[keep]:[];S.hero="litvin";S.used={};S.fast={f:0,a:0,s:0,t:0};S.pos=false;S.harm=0;
+  S.t=Math.max(S.t,14*60);S.ambAt=null;
+  if(S.lastRec==="vera"&&S.police==null){S.police=S.t+9*60;S.policeFiltered=false;S.flags.VERA_TRUST++}
+}
+SCENES.litvin=()=>{
+  render("Пролог наследника","Реанимобиль, Димитрова",`
+    <p>${hhmm(S.t)}. Вызов на планшете: «мужчина без сознания на лестнице, пятый этаж». Вы узнаёте куртку МК-112 раньше, чем лицо. Ветров. Помочь здесь уже нечем.</p>
+    ${S.lastRec==="vera"?"<p>В рации голос Веры, сорванный: «Сто семнадцатая. Он успел сказать: не ложный. Полицию я подняла сама».</p>":S.lastRec==="olga"?"<p>У Ветрова в руке рация. Последняя запись в журнале: «Оля, прости».</p>":"<p>Рация Ветрова молчит.</p>"}
+    <p>Сверху, с восьмого этажа, через открытую дверь слышен хрип.</p>`,
+  [{label:"Подняться на восьмой",primary:true,act(){go("fedor")}}]);
+};
+SCENES.petrovCall=()=>{
+  S.pressure=false;
+  render("Ф4 · Звонок","Номер без имени",`<p>Пока Фёдора Ильича грузят в машину, звонит ваш личный телефон.</p>
+    <div class="line"><span class="sp">Голос</span>«Доброй ночи, Павел Андреевич. Вы на Димитровой? В сто семнадцатой ничего интересного. Езжайте спокойно. И про четырнадцать не забывайте».</div>
+    <p>Вы знаете этот голос. Санитар морга, Геннадий Петров.</p>`,
+  [{label:"«Это ты был у неё?»",act(){S.petrovCall="ask";S.flags.PETROV=Math.max(S.flags.PETROV,1);go("fork");result("Петров, перед тем как положить трубку: «Я перевожу тех, кого мне поручают, доктор. Как и вы».")}},
+   {label:"«Хорошо, Геннадий»",act(){S.petrovCall="obey";go("fork")}},
+   {label:"Положить трубку молча",act(){S.petrovCall="hang";go("fork")}}]);
+};
+
+/* ---------- Ф5 ---------- */
+SCENES.fork=()=>{
+  S.pressure=false;
+  if(S.police!=null&&S.t<S.police)S.t=S.police;
+  const P=S.police!=null;const L=S.hero==="litvin";
+  const pre=P?`<p>Поднимается наряд. Сержант заглядывает в 117, видит билет на столе.</p><div class="line"><span class="sp">Сержант</span>«Ложный вызов. Девушка уехала в Москву, вон билет. Закрываем».</div>`
+    :`<p>Полиции нет: карточка так и осталась серой. Есть ${L?"вы":"вы, Лёня"}, пустая квартира и телефон Светланы под диваном.</p>`;
+  const o=[];
+  const pick=(id,label,sub,fn)=>o.push({label,sub,act(){S.fork=label.replace(/[«»"]/g,"");fn();go("report")}});
+  if(P)pick("agree","Согласиться: уехала, так уехала","Наряд уходит, квартиру закрывают",()=>{S.flags.SVETA="пропала"});
+  if(P)pick("insist","Настоять: «Угроза жизни». Требую розыск","Только с этой формулировкой карточку не съест «Фильтр»",()=>{S.flags.ERSHOVA=1;if(realClues()>=5){S.flags.SVETA="в розыске";S.flags.CITY+=5}else S.flags.SVETA="пропала"});
+  else pick("vera","Вере: «Оформи как угрозу жизни, под мою ответственность»","Сработает, если Вера вам доверяет",()=>{if(S.flags.VERA_TRUST>0&&realClues()>=4){S.flags.SVETA="в розыске";S.flags.ERSHOVA=1}else S.flags.SVETA="пропала"});
+  pick("keep","Забрать телефон Светланы себе","Улика вне протокола: её не потеряют, но и в суд так просто не принести",()=>{S.flags.ARCHIVE++;if(!has("phone"))clue("phone")});
+  if(P)pick("give","Отдать телефон полиции","По протоколу",()=>{S.flags.SVETA="пропала"});
+  pick("alina","Позвонить журналистке Алине Морозовой","Утром история будет в «Вороне»",()=>{S.flags.CITY+=5;S.flags.ERSHOVA=1});
+  if(has("note"))pick("lawyer","Позвонить по записке «Б. — адвокат»","",()=>{S.lawyer=1});
+  if(L){
+    pick("tellvera","Рассказать Вере про звонок Петрова","Петров станет подозреваемым. И расскажет, что знает о вас",()=>{S.flags.PETROV=Math.max(S.flags.PETROV,1.5)});
+  }
+  pick("living","«Мы спасаем живых». Ехать за Фёдором Ильичом","Расследование — не ваша работа",()=>{});
+  render("Ф5 · Развилка","Что будет со Светланой",pre+`<p style="color:var(--dim)">Правильного ответа нет. У каждого варианта своя цена.</p>`,o);
+};
+
+/* ---------- Ф6 ---------- */
+SCENES.report=()=>{
+  S.pressure=false;
+  const m=S.m,L=S.hero==="litvin";
+  const reaction=m.firstGood==null?"—":Math.max(1,Math.round(m.firstGood))+" с";
+  const acc=m.qTot?Math.round(m.qGood/m.qTot*100):0;
+  const instr=(m.inGood+m.inBad)?Math.round(m.inGood/(m.inGood+m.inBad)*100):0;
+  const alive=S.fedor&&S.fedor.startsWith("жив");
+  let score=(alive?100:-100)+(m.firstGood!=null&&m.firstGood<=10?50:m.firstGood!=null&&m.firstGood<=20?25:-25)+acc+20*m.svcGood-30*m.svcBad+Math.round(instr*1.5)+(S.kirillDead?-300:0)+(S.fedor==="жив, тромболизис успели"?100:0)+realClues()*15;
+  const grade=score>=500?"S":score>=380?"A":score>=250?"B":score>=120?"C":"D";
+  const sv={"пропала":"Пропала","в розыске":"В розыске"}[S.flags.SVETA]||S.flags.SVETA;
+  const lawyer=S.lawyer?`<div class="result">Адвокат, сонно: «Светлана должна была в среду давать показания. По клубу „Камелия“. Больше ничего по телефону не скажу». Это первая ниточка к миссии 3.3.</div>`:"";
+  render("Ф6 · Отчёт",L?"Отчёт бригады":"Отчёт координатора",`
+    <div class="row" style="align-items:center;gap:18px"><div class="grade" aria-label="Оценка смены">${grade}</div><p>Оценка измеряет работу служб, а не мораль. ${S.kirillDead?"Кирилл Ветров погиб на пятом этаже. Смену закончил Павел Литвин.":""}</p></div>
+    <div class="tw"><table>
+      <tr><th>Метрика</th><th>Значение</th></tr>
+      <tr><td>Время реакции</td><td>${reaction}</td></tr>
+      <tr><td>Точность вопросов</td><td>${m.qGood} из ${m.qTot} (${acc} %)</td></tr>
+      <tr><td>Службы</td><td>нужных: ${m.svcGood} · лишних и ошибочных: ${m.svcBad}</td></tr>
+      <tr><td>Инструкции и первая помощь</td><td>${instr} %</td></tr>
+      <tr><td>Улики</td><td>${realClues()}</td></tr>
+      <tr><td>Развилка</td><td>${esc(S.fork||"не дошли")}</td></tr>
+      <tr><td>Смерть героя</td><td>${S.kirillDead?"да · смену принял Литвин":"нет"}</td></tr>
+      <tr><td>Время окончания</td><td>${hhmmss(S.t)}</td></tr>
+    </table></div>
+    <h3 style="margin:6px 0 0;font:600 12px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--dim)">Имена</h3>
+    <p>${alive?"<b>Спасён:</b> ":"<b>Не спасён:</b> "}Фёдор Ильич Кравец, 84 года. Кормит голубей с балкона. ${esc(S.fedor||"")}.</p>
+    <p><b>${sv}:</b> Светлана Орлова, 29 лет. Собиралась в среду к адвокату.</p>
+    ${S.kirillDead?"<p><b>Погиб:</b> Кирилл Андреевич Ветров, 34 года. Часы его напарника отстают на четыре минуты.</p>":""}
+    ${lawyer}
+    <p style="color:var(--dim);font-size:14px">Что это значит дальше: флаги справа уходят в главы 2–5. «Архив 112», Петров и Ершова вернутся.</p>`,
+  [{label:"Минута тишины",primary:true,act(){silence(()=>{black([`<div class="sm">Голосовое сообщение из телефона Светланы, отправлено маме в 02:51</div><div class="big" style="margin-top:12px">«Мам, в среду всё закончится. Не звони пока».</div>`],5000,()=>go("end"))})}}]);
+};
+SCENES.end=()=>{
+  render("Конец прототипа","Смена закончена",`<p>Это миссия 1.4 из 25. В полной игре у неё 9 версий, по одной на каждого героя. Сыграйте ещё раз: другой маршрут, другое снаряжение, другой выбор в развилке. Без бронежилета на лестнице Кирилл может не дойти, и тогда смену примет Литвин.</p>`,
+  [{label:"Сыграть ещё раз",primary:true,act(){S=fresh();go("start")}}]);
+};
+
+go("start");
+})();
+</script>

@@ -25,6 +25,7 @@
 | 8 | Технический стек | [docs/08_tech_stack.md](docs/08_tech_stack.md) |
 | 9 | План MVP (2 недели) | [docs/09_mvp_plan.md](docs/09_mvp_plan.md) |
 | 10 | Этические ограничения | [docs/10_ethics.md](docs/10_ethics.md) |
+| — | **Играбельный прототип** миссии 1.4 «Ночная смена» (браузер, один HTML-файл) | [prototype/night_shift.html](prototype/night_shift.html) |
 
 ## Коротко
 

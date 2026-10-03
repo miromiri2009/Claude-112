@@ -1,11 +1,8 @@
 <title>Профиль: тренажёр ЕГЭ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,600;7..72,700&family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
-<script>
-window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]},svg:{fontCache:"global"},startup:{typeset:false}};
-</script>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" async onerror="window.__mjfail=1;var n=document.getElementById('mjnote');if(n)n.hidden=false"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;0,7..72,700;1,7..72,400&family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+
 <style>
 /* Layout: школьная тетрадь в клетку. Синяя ручка — действия и формулы, красная ручка проверяющего — ошибки и поля. Сверху вкладки режимов, под ними рабочий лист; ответ вписывается в клетки бланка, как на экзамене. */
 :root{
@@ -14,6 +11,7 @@ window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]},svg
   --line:#cfd9e6;
   --f-display:"Literata",Georgia,"Times New Roman",serif;
   --f-body:"Golos Text","Segoe UI",system-ui,-apple-system,sans-serif;
+  --f-math:"Literata",Georgia,"Times New Roman",serif;
   --f-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
@@ -50,7 +48,24 @@ h2{font:700 clamp(20px,3vw,26px)/1.2 var(--f-display);margin:0;text-wrap:balance
 .q{font-size:18px;line-height:1.65;max-width:62ch;overflow-wrap:anywhere;min-width:0}
 mjx-container{max-width:100%;overflow-x:auto;overflow-y:hidden}
 .card .back,.blitz-stmt{overflow-wrap:anywhere;max-width:100%}
-.mjnote{font:12px var(--f-mono);color:var(--red)}
+.m{font-family:var(--f-math);font-size:1.06em;line-height:1}
+.m i{font-style:italic}
+.m .fn,.m .tx{font-style:normal}
+.m .fn{margin-right:.14em}
+.m .fn+sub{margin-left:-.12em}
+.m .op{margin:0 .24em}
+.m sup,.m sub{font-size:.7em;line-height:0}
+.fr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;font-size:.9em;line-height:1.2;margin:0 .12em;white-space:nowrap}
+.fr>span{padding:0 .18em}.fr>span:first-child{border-bottom:1.2px solid currentColor}
+.sq{display:inline-flex;align-items:flex-end;white-space:nowrap}
+.sq .rs{font-family:var(--f-body);font-size:1.12em;line-height:1.15}
+.sq .rad{border-top:1.2px solid currentColor;padding:.12em .14em 0;line-height:1.2}
+.sq .ix{font-size:.6em;align-self:flex-start;margin-right:-.4em;margin-top:.1em}
+.vec{display:inline-block;position:relative;padding-top:.3em}.vec::before{content:"→";position:absolute;top:-.25em;left:0;right:0;text-align:center;font-size:.72em;font-style:normal}
+.ov{border-top:1px solid currentColor}
+.plot{margin:0;max-width:340px;width:100%}.plot svg{display:block;width:100%;height:auto;background:var(--sheet)}
+.pl{font:13px var(--f-math);font-style:italic;fill:var(--ink)}.pl.n{font-style:normal;font-size:12px}
+table.dist{width:auto;border:1.5px solid var(--ink);margin-top:10px}table.dist th,table.dist td{border:1px solid var(--ink);padding:6px 14px;text-align:center;font:16px var(--f-math)}table.dist th{text-transform:none;letter-spacing:0;background:var(--pen-soft);color:var(--ink)}
 .q mjx-container{font-size:105%!important}
 .muted{color:var(--muted)}
 .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
@@ -116,16 +131,15 @@ details summary{cursor:pointer;color:var(--pen);font-weight:600}
 <div class="app">
   <header class="top">
     <div class="brand"><small>ЕГЭ · математика · профиль</small><h1>Профиль: тренажёр</h1></div>
-    <div class="facts">19 заданий · 12 с кратким ответом<br>235 минут · минимум 27 баллов</div>
+    <div class="facts">Структура ЕГЭ-2027 (проект ФИПИ)<br>20 заданий · 13 с кратким ответом · 33 первичных балла</div>
   </header>
   <nav class="tabs" role="tablist" aria-label="Режимы">
-    <button class="tab" role="tab" data-v="train">Задания 1–12</button>
+    <button class="tab" role="tab" data-v="train">Задания 1–13</button>
     <button class="tab" role="tab" data-v="variant">Вариант</button>
     <button class="tab" role="tab" data-v="cards">Формулы</button>
     <button class="tab" role="tab" data-v="blitz">Блиц</button>
     <button class="tab" role="tab" data-v="stats">Статистика</button>
   </nav>
-  <p class="mjnote" id="mjnote" hidden>Библиотека формул не загрузилась, поэтому формулы показаны в записи TeX. Обновите страницу.</p>
   <main id="view"></main>
 </div>
 
@@ -141,11 +155,9 @@ const fmt=x=>String(rnd(x)).replace(".",",");
 const sg=(c,first)=>{c=rnd(c);if(first)return String(c).replace(".",",");return (c<0?" - ":" + ")+String(Math.abs(c)).replace(".",",")};
 const term=(c,v,first)=>{if(c===0)return"";const a=Math.abs(c);const body=(a===1?"":String(a))+v;return first?(c<0?"-":"")+body:(c<0?" - ":" + ")+body};
 const lin=(v,c)=>c===0?v:v+(c<0?" - "+Math.abs(c):" + "+c);
-function typeset(el){if(window.MathJax&&MathJax.typesetPromise){MathJax.typesetPromise([el]).catch(()=>{})}else{setTimeout(()=>{if(window.MathJax&&MathJax.typesetPromise)MathJax.typesetPromise([el]).catch(()=>{})},700)}}
 
-/* ================= ЗАДАНИЯ 1–12 ================= */
-const TOPIC={1:"Планиметрия",2:"Векторы",3:"Стереометрия",4:"Теория вероятностей",5:"Вероятности сложных событий",6:"Простейшие уравнения",7:"Вычисления и преобразования",8:"Производная",9:"Задача с прикладным содержанием",10:"Текстовая задача",11:"Графики функций",12:"Наибольшее и наименьшее значение"};
-const GEN={
+/* ================= генераторы прежней нумерации (ЕГЭ-2026) ================= */
+const OLD={
 1:[()=>{const p=pick([0.2,0.4,0.6,0.8,0.25,0.75]);const c=(p===0.25||p===0.75)?4*R(1,10):5*R(1,10);const a=c*p;
     return{q:T`В треугольнике \(ABC\) угол \(C\) равен \(90^\circ\), \(AB=${c}\), \(\sin A=${fmt(p)}\). Найдите \(BC\).`,a,sol:T`\(BC=AB\cdot\sin A=${c}\cdot${fmt(p)}=${fmt(a)}\).`}},
    ()=>{const d=R(15,70);return{q:T`Центральный угол на \(${d}^\circ\) больше острого вписанного угла, опирающегося на ту же дугу окружности. Найдите вписанный угол. Ответ дайте в градусах.`,a:d,sol:T`Центральный угол вдвое больше вписанного: \(2x-x=${d}\), \(x=${d}^\circ\).`}},
@@ -188,7 +200,133 @@ const GEN={
 12:[()=>{const a=R(1,6),c=R(-20,20);return{q:T`Найдите точку максимума функции \(y=x^3-${3*a*a}x${c?sg(c):""}\).`,a:-a,sol:T`\(y'=3x^2-${3*a*a}=0\), \(x=\pm${a}\). Производная меняет знак с «+» на «−» в точке \(x=-${a}\).`}},
    ()=>{const m=R(1,4),c=R(-10,60);return{q:T`Найдите наименьшее значение функции \(y=x^3-${3*m*m}x${c?sg(c):""}\) на отрезке \([0;\,${m+1}]\).`,a:c-2*m**3,sol:T`\(y'=3x^2-${3*m*m}\), на отрезке критическая точка \(x=${m}\) — минимум. \(y(${m})=${m**3}-${3*m**3}${c?sg(c):""}=${c-2*m**3}\).`}}]
 };
+/* ---------- рендер формул (подмножество TeX, без внешних библиотек) ---------- */
+const SYM={alpha:"α",beta:"β",gamma:"γ",sigma:"σ",pi:"π",cdot:"·",le:"≤",ge:"≥",pm:"±",in:"∈",infty:"∞",angle:"∠",cup:"∪",cap:"∩",Leftrightarrow:"⇔",approx:"≈",quad:"\u2003",times:"×",to:"→",ldots:"…",circ:"°",",":"\u2009"," ":"\u2002",";":"\u2005","%":"%"};
+const FNS=new Set(["sin","cos","tg","ctg","log","ln","lg","arcsin","arccos","arctg","max","min"]);
+const escH=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function tex(s){
+  let i=0;
+  const skip=()=>{while(s[i]===" ")i++};
+  const plainEnd=o=>o.replace(/<[^>]*>/g,"").replace(/[\s\u2009\u2002\u2003\u2005]+$/,"").slice(-1);
+  function argRaw(){skip();if(s[i]==="{"){let d=0,t="";i++;while(i<s.length){if(s[i]==="{")d++;if(s[i]==="}"){if(d===0){i++;break}d--}t+=s[i++]}return t}return s[i++]||""}
+  function ch(c){if(/[a-zA-Z]/.test(c))return `<i>${c}</i>`;if(c==="-")return "−";if(c==="'")return "′";return escH(c)}
+  function arg(){skip();if(s[i]==="{"){i++;return group("}")}if(s[i]==="\\")return cmd();return ch(s[i++]||"")}
+  function cmd(){
+    i++;if(!/[a-zA-Z]/.test(s[i]||"")){const c=s[i++];return SYM[c]!==undefined?SYM[c]:escH(c)}
+    let n="";while(i<s.length&&/[a-zA-Z]/.test(s[i]))n+=s[i++];
+    if(n==="frac"||n==="dfrac"||n==="tfrac"){const a=arg(),b=arg();return `<span class="fr"><span>${a}</span><span>${b}</span></span>`}
+    if(n==="sqrt"){skip();let idx="";if(s[i]==="["){i++;let t="";while(i<s.length&&s[i]!=="]")t+=s[i++];i++;idx=`<span class="ix">${tex(t)}</span>`}const a=arg();return `<span class="sq">${idx}<span class="rs">√</span><span class="rad">${a}</span></span>`}
+    if(n==="vec")return `<span class="vec">${arg()}</span>`;
+    if(n==="bar"||n==="overline")return `<span class="ov">${arg()}</span>`;
+    if(n==="operatorname"||n==="mathrm")return `<span class="fn">${escH(argRaw())}</span>`;
+    if(n==="text")return `<span class="tx">${escH(argRaw())}</span>`;
+    if(n==="mathbb"){const a=argRaw();return {Z:"ℤ",R:"ℝ",N:"ℕ"}[a]||a}
+    if(n==="left"||n==="right"){skip();const c=s[i++];return c==="."?"":escH(c)}
+    if(FNS.has(n))return `<span class="fn">${n}</span>`;
+    if(SYM[n]!==undefined)return SYM[n];
+    return escH(n);
+  }
+  function group(end){
+    let out="";
+    while(i<s.length){
+      const c=s[i];
+      if(end&&c===end){i++;return out}
+      if(c==="{"){i++;out+=group("}");continue}
+      if(c==="\\"){out+=cmd();continue}
+      if(c==="^"||c==="_"){i++;skip();if(c==="^"&&s.startsWith("\\circ",i)){i+=5;out+="°";continue}const a=arg();out+=c==="^"?`<sup>${a}</sup>`:`<sub>${a}</sub>`;continue}
+      if(c===" "){i++;continue}
+      if(/[0-9]/.test(c)){let t="";while(i<s.length&&(/[0-9]/.test(s[i])||((s[i]===","||s[i]===".")&&/[0-9]/.test(s[i+1]||"")&&/[0-9]/.test(s[i-1]||""))))t+=s[i++];out+=t;continue}
+      if(c==="-"){i++;const p=plainEnd(out);out+=(p===""||"(=;,[−+·≤≥⇔".includes(p))?"−":`<span class="op">−</span>`;continue}
+      if("+=<>".includes(c)){i++;out+=`<span class="op">${escH(c)}</span>`;continue}
+      if(c===";"){i++;out+=";\u2005";continue}
+      out+=ch(c);i++;
+    }
+    return out;
+  }
+  return group(null);
+}
+function mathify(html){return html.replace(/\\\(([\s\S]+?)\\\)/g,(m,t)=>`<span class="m">${tex(t)}</span>`)}
+function typeset(el){if(el)el.innerHTML=mathify(el.innerHTML)}
+
+/* ---------- график функции на клетчатом поле ---------- */
+function plot(o){
+  const [x0,x1]=o.xr,[y0,y1]=o.yr,u=24,W=(x1-x0)*u,H=(y1-y0)*u;
+  const X=x=>(x-x0)*u,Y=y=>(y1-y)*u;
+  let g="";
+  for(let x=x0;x<=x1;x++)g+=`<line x1="${X(x)}" y1="0" x2="${X(x)}" y2="${H}" stroke="var(--line)" stroke-width="1"/>`;
+  for(let y=y0;y<=y1;y++)g+=`<line x1="0" y1="${Y(y)}" x2="${W}" y2="${Y(y)}" stroke="var(--line)" stroke-width="1"/>`;
+  let ax="";
+  if(y0<0&&y1>0)ax+=`<line x1="0" y1="${Y(0)}" x2="${W}" y2="${Y(0)}" stroke="var(--ink)" stroke-width="1.4"/><path d="M${W},${Y(0)} l-8,-4 v8 z" fill="var(--ink)"/><text x="${W-10}" y="${Y(0)+16}" class="pl">x</text>`;
+  if(x0<0&&x1>0)ax+=`<line x1="${X(0)}" y1="${H}" x2="${X(0)}" y2="0" stroke="var(--ink)" stroke-width="1.4"/><path d="M${X(0)},0 l-4,8 h8 z" fill="var(--ink)"/><text x="${X(0)+8}" y="12" class="pl">y</text>`;
+  if(x0<0&&x1>0&&y0<0&&y1>0)ax+=`<text x="${X(0)-12}" y="${Y(0)+15}" class="pl n">0</text><text x="${X(1)-4}" y="${Y(0)+15}" class="pl n">1</text><text x="${X(0)-12}" y="${Y(1)+5}" class="pl n">1</text>`;
+  let cv="";
+  (o.curves||[]).forEach(c=>{const a=c.dom?c.dom[0]:x0,b=c.dom?c.dom[1]:x1;let d="",pen=false,prev=null;const N=600;
+    for(let k=0;k<=N;k++){const x=a+(b-a)*k/N,y=c.f(x);const okp=isFinite(y)&&y>y0-3&&y<y1+3&&!(prev!=null&&Math.abs(y-prev)>(y1-y0));
+      if(okp){d+=(pen?"L":"M")+X(x).toFixed(1)+","+Y(y).toFixed(1);pen=true}else pen=false;prev=isFinite(y)?y:null}
+    cv+=`<path d="${d}" fill="none" stroke="var(--pen)" stroke-width="2.4" stroke-linejoin="round"/>`});
+  (o.lines||[]).forEach(l=>{const[ax1,ay1,ax2,ay2]=l;const k=(ay2-ay1)/(ax2-ax1);const f=x=>ay1+k*(x-ax1);cv+=`<line x1="${X(x0)}" y1="${Y(f(x0))}" x2="${X(x1)}" y2="${Y(f(x1))}" stroke="${l[4]||"var(--pen)"}" stroke-width="2"/>`});
+  (o.dashes||[]).forEach(x=>{cv+=`<line x1="${X(x)}" y1="${Y(0)}" x2="${X(x)}" y2="${Y(o.dashTo)}" stroke="var(--muted)" stroke-width="1.2" stroke-dasharray="4 3"/><text x="${X(x)+3}" y="${Y(0)+15}" class="pl n">x₀</text>`});
+  let pts="";(o.points||[]).forEach(p=>{pts+=`<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="4" fill="var(--ink)"/>`});
+  return `<figure class="plot"><svg viewBox="-2 -2 ${W+4} ${H+4}" role="img" aria-label="График функции на координатной сетке"><defs><clipPath id="clip${o.id}"><rect x="0" y="0" width="${W}" height="${H}"/></clipPath></defs>${g}${ax}<g clip-path="url(#clip${o.id})">${cv}</g>${pts}</svg></figure>`;
+}
+let plotId=0;
+
+/* ================= ЗАДАНИЯ 1–13 (структура ЕГЭ-2027, проект ФИПИ) ================= */
+const NT=13;
+const TOPIC={1:"Планиметрия",2:"Векторы",3:"Стереометрия",4:"Теория вероятностей",5:"Вероятности сложных событий",6:"Случайная величина",7:"Простейшие уравнения",8:"Вычисления и преобразования",9:"Производная",10:"Задача с прикладным содержанием",11:"Текстовая задача",12:"Графики функций",13:"Финансовая математика"};
+const distTable=(xs,ps)=>`<div class="tw"><table class="dist"><tr><th>\\(x_i\\)</th>${xs.map(x=>`<td>${String(x).replace("-","−")}</td>`).join("")}</tr><tr><th>\\(p_i\\)</th>${ps.map(p=>`<td>${p}</td>`).join("")}</tr></table></div>`;
+function probs(k){let ps;do{ps=[];let left=10;for(let j=0;j<k-1;j++){const p=R(1,left-(k-1-j));ps.push(p);left-=p}ps.push(left)}while(ps.some(p=>p<=0));return ps.map(p=>p/10)}
+function distinct(k,a,b){const s=new Set();while(s.size<k)s.add(R(a,b));return [...s].sort((x,y)=>x-y)}
+const rub=n=>String(n).replace(/\B(?=(\d{3})+(?!\d))/g,"\u2009");
+const GEN={
+1:OLD[1],2:OLD[2],3:OLD[3],4:OLD[4],5:OLD[5],
+6:[()=>{const xs=distinct(3,-5,9),ps=probs(3);const m=rnd(xs.reduce((s,x,j)=>s+x*ps[j],0));
+    return{q:T`Случайная величина \(X\) задана таблицей распределения. Найдите математическое ожидание \(M(X)\).`+distTable(xs,ps.map(fmt)),a:m,sol:T`\(M(X)=${xs.map((x,j)=>(x<0?"("+x+")":x)+"\\cdot"+fmt(ps[j])).join("+")}=${fmt(m)}\).`}},
+   ()=>{const xs=distinct(3,-4,8),ps=probs(3);const h=R(0,2);const m=rnd(xs.reduce((s,x,j)=>s+x*ps[j],0));
+    return{q:T`Случайная величина \(X\) задана таблицей распределения, одна вероятность неизвестна. Найдите \(M(X)\).`+distTable(xs,ps.map((p,j)=>j===h?"\\(p\\)":fmt(p))),a:m,sol:T`Сумма вероятностей равна 1: \(p=${fmt(ps[h])}\). Тогда \(M(X)=${fmt(m)}\).`}},
+   ()=>{let xs,ps,m,d;do{xs=distinct(2,-3,6);ps=probs(2);m=rnd(xs[0]*ps[0]+xs[1]*ps[1]);d=rnd(xs[0]**2*ps[0]+xs[1]**2*ps[1]-m*m)}while(!Number.isInteger(rnd(d*100,4)));
+    return{q:T`Случайная величина \(X\) задана таблицей распределения. Найдите дисперсию \(D(X)\).`+distTable(xs,ps.map(fmt)),a:d,sol:T`\(M(X)=${fmt(m)}\), \(M(X^2)=${fmt(rnd(xs[0]**2*ps[0]+xs[1]**2*ps[1]))}\), \(D(X)=M(X^2)-(M(X))^2=${fmt(d)}\).`}},
+   ()=>{const m=R(-6,9),d=R(1,12),a=pick([2,3,-2,4,5,-3]),b=R(-9,9);return pick([
+     {q:T`Известно, что \(M(X)=${m}\). Найдите \(M(${a}X${b?sg(b):""})\).`,a:a*m+b,sol:T`\(M(aX+b)=aM(X)+b=${a}\cdot${m<0?"("+m+")":m}${b?sg(b):""}=${a*m+b}\).`},
+     {q:T`Известно, что \(D(X)=${d}\). Найдите \(D(${a}X${b?sg(b):""})\).`,a:a*a*d,sol:T`\(D(aX+b)=a^2D(X)=${a*a}\cdot${d}=${a*a*d}\). Сдвиг на число дисперсию не меняет.`}])},
+   ()=>{const c=pick([[100,0.2,4],[100,0.5,5],[36,0.5,3],[64,0.5,4],[25,0.2,2],[400,0.1,6],[16,0.5,2],[100,0.1,3]]);const[n,p,s]=c;const t=pick(["M","D","s"]);
+     const a=t==="M"?rnd(n*p):t==="D"?rnd(n*p*(1-p)):s;
+     return{q:T`Стрелок делает ${n} независимых выстрелов, вероятность попадания при каждом равна ${fmt(p)}. Случайная величина \(X\) — число попаданий. Найдите ${t==="M"?T`математическое ожидание \(M(X)\)`:t==="D"?T`дисперсию \(D(X)\)`:T`стандартное отклонение \(\sigma(X)\)`}.`,a,sol:T`\(X\) распределена по биномиальному закону: \(M(X)=np=${fmt(n*p)}\), \(D(X)=np(1-p)=${fmt(rnd(n*p*(1-p)))}\)${t==="s"?T`, \(\sigma=\sqrt{D(X)}=${s}\)`:""}.`}}],
+7:OLD[6],8:OLD[7],
+9:[...OLD[8],
+   ()=>{let x0,y0,dx,dy,c;do{x0=R(-3,3);y0=R(-2,3);dx=pick([1,2,4,-2,-4]);dy=pick([1,2,3,4,5,-1,-2,-3,-4,-5]);c=pick([0.3,-0.3,0.25,-0.25,0.4,-0.4])}while(Math.abs(x0+dx)>5||Math.abs(y0+dy)>5||dy/dx===0);
+    const k=rnd(dy/dx);const f=x=>y0+k*(x-x0)+c*(x-x0)**2;
+    const pic=plot({id:++plotId,xr:[-6,6],yr:[-6,6],curves:[{f,dom:[x0-4.5,x0+4.5]}],lines:[[x0,y0,x0+dx,y0+dy,"var(--red)"]],points:[[x0,y0],[x0+dx,y0+dy]],dashes:[x0],dashTo:y0});
+    return{q:T`На рисунке изображены график функции \(y=f(x)\) и касательная к нему в точке с абсциссой \(x_0\). Найдите значение производной функции \(f(x)\) в точке \(x_0\).`+pic,a:k,sol:T`\(f'(x_0)\) равна угловому коэффициенту касательной. Касательная проходит через точки \((${x0};\,${y0})\) и \((${x0+dx};\,${y0+dy})\): \(k=\frac{${dy}}{${dx}}=${fmt(k)}\).`}}],
+10:OLD[9],11:OLD[10],
+12:[()=>{let k,a,cand;do{k=pick([1,2,3,4,6,-1,-2,-3,-4,-6]);a=R(-3,3);cand=[];for(let x=-5;x<=5;x++){if(x&&k%x===0&&Math.abs(k/x+a)<=5)cand.push(x)}}while(cand.length<2);
+    const xs=[];while(xs.length<2){const x=pick(cand);if(!xs.includes(x))xs.push(x)}
+    const x3=pick([8,10,16,20,25,40,-8,-10,-16,-20,-25,-40]);const f=x=>k/x+a;const ans=rnd(f(x3));
+    const pic=plot({id:++plotId,xr:[-6,6],yr:[-6,6],curves:[{f}],points:xs.map(x=>[x,f(x)])});
+    return{q:T`На рисунке изображён график функции \(f(x)=\dfrac{k}{x}+a\). Найдите \(f(${x3})\).`+pic,a:ans,sol:T`По точкам \((${xs[0]};\,${f(xs[0])})\) и \((${xs[1]};\,${f(xs[1])})\): \(k=${k}\), \(a=${a}\). \(f(${x3})=\frac{${k}}{${x3}}${a<0?"-"+(-a):"+"+a}=${fmt(ans)}\).`}},
+   ()=>{let a,p,q,t;do{a=pick([1,-1,2,-2]);p=R(-3,3);q=R(-4,4);t=p+pick([-6,-5,-4,4,5,6])}while(Math.abs(q+a)>5);const f=x=>a*(x-p)**2+q;
+    const pic=plot({id:++plotId,xr:[-6,6],yr:[-6,6],curves:[{f}],points:[[p,q],[p+1,f(p+1)]]});
+    return{q:T`На рисунке изображён график функции \(f(x)=ax^2+bx+c\). Найдите \(f(${t})\).`+pic,a:f(t),sol:T`Вершина \((${p};\,${q})\), значит \(f(x)=a(x${p<0?"+"+(-p):p?"-"+p:""})^2${q<0?q:"+"+q}\). Точка \((${p+1};\,${f(p+1)})\) даёт \(a=${a}\). \(f(${t})=${f(t)}\).`}},
+   ()=>{let L1,L2,xi;do{const mk=()=>{const x1=R(-5,3),y1=R(-5,5),dx=pick([1,2,4]),dy=R(-5,5);return[x1,y1,x1+dx,y1+dy]};L1=mk();L2=mk();
+      const k1=(L1[3]-L1[1])/(L1[2]-L1[0]),k2=(L2[3]-L2[1])/(L2[2]-L2[0]);if(k1===k2){xi=NaN;continue}
+      const b1=L1[1]-k1*L1[0],b2=L2[1]-k2*L2[0];xi=rnd((b2-b1)/(k1-k2))}while(!isFinite(xi)||!Number.isInteger(rnd(xi*100,4))||Math.abs(xi)>40||[L1,L2].some(l=>Math.abs(l[3])>5||l[2]>5));
+    const pic=plot({id:++plotId,xr:[-6,6],yr:[-6,6],lines:[L1,[...L2,"var(--red)"]],points:[[L1[0],L1[1]],[L1[2],L1[3]],[L2[0],L2[1]],[L2[2],L2[3]]]});
+    return{q:T`На рисунке изображены графики двух линейных функций. Найдите абсциссу точки пересечения графиков.`+pic,a:xi,sol:T`Уравнения прямых находим по отмеченным точкам, затем приравниваем правые части: \(x=${fmt(xi)}\).`}},
+   ()=>{const a=pick([2,3]),b=R(-3,1),k=a===2?pick([3,4,5]):pick([3,4]);const f=x=>a**(x+b);const x3=-b+k;
+    const pic=plot({id:++plotId,xr:[-6,6],yr:[-2,10],curves:[{f}],points:[[-b,1],[1-b,a]]});
+    return{q:T`На рисунке изображён график функции \(f(x)=a^{x+b}\). Найдите \(f(${x3})\).`+pic,a:a**k,sol:T`\(f(${-b})=1\), значит \(b=${b}\); \(f(${1-b})=${a}\), значит \(a=${a}\). \(f(${x3})=${a}^{${k}}=${a**k}\).`}},
+   ()=>{const a=pick([2,3]),b=R(-2,3),k=a===2?pick([3,4,5]):pick([3,4]);const f=x=>Math.log(x+b)/Math.log(a);const x3=a**k-b;
+    const pic=plot({id:++plotId,xr:[-6,6],yr:[-5,5],curves:[{f,dom:[-b+0.0005,6]}],points:[[1-b,0],[a-b,1]]});
+    return{q:T`На рисунке изображён график функции \(f(x)=\log_a(x+b)\). Найдите \(f(${x3})\).`+pic,a:k,sol:T`\(f(${1-b})=0\), значит \(b=${b}\); \(f(${a-b})=1\), значит \(a=${a}\). \(f(${x3})=\log_{${a}}${a**k}=${k}\).`}}],
+13:[()=>{const r=pick([10,20,25,50]);const n=r===25||r===50?2:pick([2,3]);const S=pick([100000,200000,400000,500000,1000000]);const res=rnd(S*(1+r/100)**n);
+    return{q:T`Вкладчик положил в банк ${rub(S)} рублей под ${r}\(\%\) годовых. В конце каждого года банк начисляет проценты на всю сумму вклада, включая ранее начисленные проценты. Сколько рублей будет на счёте через ${n} ${n===2?"года":"года"}, если вкладчик не снимал деньги и не пополнял вклад?`,a:res,sol:T`\(S_n=S\left(1+\frac{r}{100}\right)^n=${rub(S)}\cdot${fmt(1+r/100)}^{${n}}=${rub(res)}\).`}},
+   ()=>{const c=pick([[10,[2100000,1050000,4200000],121,210],[20,[1100000,2200000,550000],36,55],[25,[3600000,1800000,720000],25,36],[50,[1000000,2000000],9,10]]);const[r,Ss,num,den]=c;const S=pick(Ss);const x=S*num/den;
+    return{q:T`31 декабря взяли кредит ${rub(S)} рублей под ${r}\(\%\) годовых. Схема выплаты такая: 31 декабря каждого следующего года банк начисляет проценты на оставшуюся сумму долга, затем заёмщик переводит в банк \(x\) рублей. Какой должна быть сумма \(x\), чтобы долг был полностью погашен двумя равными платежами, то есть за два года?`,a:x,sol:T`Пусть \(k=1+\frac{${r}}{100}=${fmt(1+r/100)}\). Тогда \((Sk-x)k-x=0\), \(x=\frac{Sk^2}{k+1}=${rub(x)}\).`}},
+   ()=>{const S=pick([600000,900000,1200000,1800000,2400000]),n=pick([5,9,11,15,19,23]),r=pick([1,2,3]);const over=S*r/100*(n+1)/2;const ask=pick(["over","total"]);const a=ask==="over"?over:S+over;
+    return{q:T`15 января планируется взять кредит в банке на ${rub(S)} рублей на ${n} месяцев. Условия возврата: 1-го числа каждого месяца долг возрастает на ${r}\(\%\) по сравнению с концом предыдущего месяца; со 2-го по 14-е число каждого месяца нужно выплатить часть долга; 15-го числа каждого месяца долг должен быть на одну и ту же сумму меньше долга на 15-е число предыдущего месяца. ${ask==="over"?"На сколько рублей общая сумма выплат превысит сумму кредита?":"Какой будет общая сумма выплат после полного погашения кредита? Ответ дайте в рублях."}`,a,sol:T`Долг уменьшается равномерно, проценты начисляются на \(S,\ \frac{n-1}{n}S,\ \ldots,\ \frac1nS\). Переплата \(=S\cdot\frac{r}{100}\cdot\frac{n+1}{2}=${rub(over)}\)${ask==="total"?T`, всего \(${rub(S+over)}\)`:""}.`}}]
+};
 function genTask(n){const t=pick(GEN[n])();t.n=n;t.topic=TOPIC[n];return t}
+
 
 /* ================= ФОРМУЛЫ ================= */
 const F=[
@@ -252,7 +390,15 @@ const F=[
 ["Вероятность","Классическая вероятность",T`P(A)=\dfrac mn`],
 ["Вероятность","Вероятность суммы событий",T`P(A\cup B)=P(A)+P(B)-P(A\cap B)`],
 ["Вероятность","Независимые события",T`P(A\cap B)=P(A)\cdot P(B)`],
-["Вероятность","Противоположное событие",T`P(\bar A)=1-P(A)`]
+["Вероятность","Противоположное событие",T`P(\bar A)=1-P(A)`],
+["Случайные величины","Математическое ожидание",T`M(X)=x_1p_1+x_2p_2+\ldots+x_np_n`],
+["Случайные величины","Дисперсия",T`D(X)=M(X^2)-(M(X))^2`],
+["Случайные величины","Стандартное отклонение",T`\sigma(X)=\sqrt{D(X)}`],
+["Случайные величины","Свойства M и D",T`M(aX+b)=aM(X)+b,\quad D(aX+b)=a^2D(X)`],
+["Случайные величины","Биномиальное распределение",T`M(X)=np,\quad D(X)=np(1-p)`],
+["Финансы","Сложные проценты",T`S_n=S\left(1+\dfrac{r}{100}\right)^n`],
+["Финансы","Два равных платежа (k = 1 + r/100)",T`x=\dfrac{Sk^2}{k+1}`],
+["Финансы","Переплата при равномерном уменьшении долга",T`П=S\cdot\dfrac{r}{100}\cdot\dfrac{n+1}{2}`]
 ].map((x,i)=>({id:"f"+i,topic:x[0],name:x[1],tex:x[2]}));
 const WRONG=[
 T`\sin2\alpha=2\sin\alpha`,T`\cos2\alpha=2\sin^2\alpha-1`,T`\sin^2\alpha-\cos^2\alpha=1`,T`\operatorname{tg}\alpha=\dfrac{\cos\alpha}{\sin\alpha}`,T`\sin(\alpha+\beta)=\sin\alpha+\sin\beta`,T`\cos(\alpha+\beta)=\cos\alpha\cos\beta+\sin\alpha\sin\beta`,
@@ -263,12 +409,12 @@ T`a_n=a_1+dn`,T`S_n=(a_1+a_n)\,n`,T`b_n=b_1q^{\,n}`,
 T`(\cos x)'=\sin x`,T`(\ln x)'=\ln x`,T`(x^n)'=x^{n-1}`,T`(uv)'=u'v'`,T`(a^x)'=xa^{x-1}`,
 T`S=ab\sin\gamma`,T`c^2=a^2+b^2+2ab\cos\gamma`,T`S=(a+b)\cdot h`,T`C=\pi R`,
 T`V=\pi R^2h\ \text{(конус)}`,T`V=\tfrac34\pi R^3\ \text{(шар)}`,T`S=2\pi R^2\ \text{(сфера)}`,T`V=S_{осн}\cdot h\ \text{(пирамида)}`,
-T`P(A\cup B)=P(A)+P(B)\ \text{(всегда)}`,T`P(\bar A)=P(A)-1`
+T`P(A\cup B)=P(A)+P(B)\ \text{(всегда)}`,T`P(\bar A)=P(A)-1`,T`D(aX+b)=aD(X)+b`,T`M(aX+b)=aM(X)`,T`\sigma(X)=(D(X))^2`,T`D(X)=(M(X))^2-M(X^2)`,T`S_n=S\cdot\dfrac{r}{100}\cdot n\ \text{(сложные проценты)}`
 ];
 
 /* ================= ХРАНИЛИЩЕ ================= */
-const KEY="ege-math-profile-v1";
-function load(){try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.tasks)return s}catch(e){}return{tasks:{},days:[],cards:{},blitzBest:0,blitzRuns:0,variants:[],solved:0}}
+const KEY="ege-math-2027-v1";
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.tasks)return s;const o=JSON.parse(localStorage.getItem("ege-math-profile-v1")||"null");if(o)return{tasks:{},days:o.days||[],cards:o.cards||{},blitzBest:o.blitzBest||0,blitzRuns:o.blitzRuns||0,variants:[],solved:0}}catch(e){}return{tasks:{},days:[],cards:{},blitzBest:0,blitzRuns:0,variants:[],solved:0}}
 let ST=load();
 function save(){try{localStorage.setItem(KEY,JSON.stringify(ST))}catch(e){}}
 function today(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
@@ -300,17 +446,17 @@ function show(v){view=v;clearTimers();document.querySelectorAll(".tab").forEach(
 /* ---------- Задания 1–12 ---------- */
 let trainN=0,cur=null;
 function Train(){
-  cur=genTask(trainN||R(1,12));
+  cur=genTask(trainN||R(1,NT));
   const V=$("#view");
   V.innerHTML=`<section class="sheet margin">
-    <div class="chips" role="group" aria-label="Номер задания"><button class="chip" aria-pressed="${trainN===0}" data-n="0">Любой</button>${Array.from({length:12},(_,i)=>`<button class="chip" aria-pressed="${trainN===i+1}" data-n="${i+1}">${i+1}</button>`).join("")}</div>
+    <div class="chips" role="group" aria-label="Номер задания"><button class="chip" aria-pressed="${trainN===0}" data-n="0">Любой</button>${Array.from({length:NT},(_,i)=>`<button class="chip" aria-pressed="${trainN===i+1}" data-n="${i+1}">${i+1}</button>`).join("")}</div>
     <div class="eyebrow"><span class="num">${cur.n}</span><span>${cur.topic}</span><span>1 первичный балл</span></div>
     <div class="q" id="q">${cur.q}</div>
     ${blank("ans")}
     <div class="row"><button class="btn primary" id="check">Проверить</button><button class="btn ghost" id="skip">Другое задание</button></div>
     <div id="res"></div>
   </section>
-  <p class="muted" style="font-size:13px;margin:0">Задания составлены по типам первой части КИМ профильного ЕГЭ (открытый банк ФИПИ); числа генерируются заново каждый раз. В задании 11 на экзамене дан рисунок графика, здесь — его словесное описание.</p>`;
+  <p class="muted" style="font-size:13px;margin:0">Нумерация — по проекту демоверсии ЕГЭ-2027 (ФИПИ): добавлены задания 6 (случайная величина) и 13 (финансовая математика), убрано задание на точку экстремума. Задания составлены по типам открытого банка ФИПИ, числа генерируются заново каждый раз.</p>`;
   typeset($("#q"));
   V.querySelectorAll(".chip").forEach(c=>c.addEventListener("click",()=>{trainN=+c.dataset.n;Train()}));
   let done=false;
@@ -326,10 +472,10 @@ function Train(){
 let VAR=null;
 function Variant(){
   const V=$("#view");
-  if(!VAR||VAR.done){VAR={tasks:Array.from({length:12},(_,i)=>genTask(i+1)),start:Date.now(),done:false}}
+  if(!VAR||VAR.done){VAR={tasks:Array.from({length:NT},(_,i)=>genTask(i+1)),start:Date.now(),done:false}}
   const el=()=>{const s=Math.floor((Date.now()-VAR.start)/1000);return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")};
   V.innerHTML=`<section class="sheet margin">
-    <div class="row" style="justify-content:space-between"><div><div class="eyebrow">Тренировочный вариант · часть 1</div><h2>Задания 1–12</h2></div><div class="timer" id="vt">${el()}</div></div>
+    <div class="row" style="justify-content:space-between"><div><div class="eyebrow">Тренировочный вариант · часть 1</div><h2>Задания 1–13</h2></div><div class="timer" id="vt">${el()}</div></div>
     <p class="muted" style="margin:0">На экзамене на всю работу даётся 235 минут. Первую часть стоит решать за 60–90 минут.</p>
     <div class="vlist">${VAR.tasks.map((t,i)=>`<div class="vitem"><div class="eyebrow"><span class="num">${t.n}</span><span>${t.topic}</span><span id="m${i}"></span></div><div class="q">${t.q}</div>${blank("v"+i)}<div id="vs${i}"></div></div>`).join("")}</div>
     <div class="row"><button class="btn primary" id="finish">Завершить и проверить</button><button class="btn ghost" id="newv">Новый вариант</button></div>
@@ -344,10 +490,10 @@ function Variant(){
     let score=0;VAR.answers=VAR.tasks.map((_,i)=>$("#v"+i).value);
     VAR.tasks.forEach((t,i)=>{const v=parseAns(VAR.answers[i]);const ok=same(v,t.a);if(ok)score++;recordTask(t.n,ok);
       $("#m"+i).innerHTML=ok?`<span class="mark-ok">+1</span>`:`<span class="mark-bad">0</span>`;
-      $("#vs"+i).innerHTML=`<div class="verdict ${ok?"ok":"bad"}"><b>${ok?"Верно":"Ответ: "+fmt(t.a)}</b><span>${t.sol}</span></div>`});
+      $("#vs"+i).innerHTML=`<div class="verdict ${ok?"ok":"bad"}"><b>${ok?"Верно":"Ответ: "+fmt(t.a)}</b><span>${t.sol}</span></div>`;typeset($("#vs"+i))});
     ST.variants.push({d:today(),score,secs});if(ST.variants.length>60)ST.variants.shift();save();
-    $("#vres").innerHTML=`<div class="verdict ${score>=6?"ok":"bad"}"><b>Первичный балл за часть 1: ${score} из 12</b>Время: ${Math.floor(secs/60)} мин ${secs%60} с. Минимальный порог профильного ЕГЭ — 27 тестовых баллов. Перевод первичных баллов в тестовые ФИПИ публикует каждый год, поэтому здесь показан только первичный балл.</div>`;
-    typeset(V);$("#finish").disabled=true;$("#vres").scrollIntoView({block:"center"});
+    $("#vres").innerHTML=`<div class="verdict ${score>=7?"ok":"bad"}"><b>Первичный балл за часть 1: ${score} из ${NT}</b>Время: ${Math.floor(secs/60)} мин ${secs%60} с. Минимальный порог профильного ЕГЭ — 27 тестовых баллов. Перевод первичных баллов в тестовые ФИПИ публикует каждый год, поэтому здесь показан только первичный балл.</div>`;
+    $("#finish").disabled=true;$("#vres").scrollIntoView({block:"center"});
   });
 }
 
@@ -420,7 +566,7 @@ function Stats(){
   const tot=Object.values(ST.tasks).reduce((a,r)=>a+r.total,0),ok=Object.values(ST.tasks).reduce((a,r)=>a+r.ok,0);
   const learned=F.filter(f=>cardState(f.id).box>=4).length;
   const best=ST.variants.reduce((m,v)=>Math.max(m,v.score),0);
-  const rows=Array.from({length:12},(_,i)=>{const r=ST.tasks[i+1]||{ok:0,total:0};return{n:i+1,ok:r.ok,total:r.total,p:r.total?Math.round(r.ok/r.total*100):null}});
+  const rows=Array.from({length:NT},(_,i)=>{const r=ST.tasks[i+1]||{ok:0,total:0};return{n:i+1,ok:r.ok,total:r.total,p:r.total?Math.round(r.ok/r.total*100):null}});
   const weak=rows.filter(r=>r.total>=3).sort((a,b)=>a.p-b.p).slice(0,3);
   V.innerHTML=`<section class="sheet">
     <div class="eyebrow">Статистика хранится только в этом браузере</div>
@@ -430,12 +576,12 @@ function Stats(){
       <div class="tile"><b>${streak()}</b><span>дней подряд</span></div>
       <div class="tile"><b>${learned}/${F.length}</b><span>формул выучено (коробка 4–5)</span></div>
       <div class="tile"><b>${ST.blitzBest}</b><span>рекорд блица</span></div>
-      <div class="tile"><b>${ST.variants.length?best+"/12":"—"}</b><span>лучший вариант</span></div>
+      <div class="tile"><b>${ST.variants.length?best+"/"+NT:"—"}</b><span>лучший вариант</span></div>
     </div>
-    <div><h2 style="font-size:20px">Точность по номерам заданий</h2><p class="muted" style="margin:4px 0 0;font-size:14px">${tot?(weak.length?"Слабые места: "+weak.map(w=>"№"+w.n+" ("+w.p+" %)").join(", ")+".":"Решите хотя бы по 3 задания каждого номера, чтобы увидеть слабые места."):"Пока пусто. Решите несколько заданий во вкладке «Задания 1–12» или вариант целиком: здесь появятся столбцы по каждому номеру."}</p></div>
+    <div><h2 style="font-size:20px">Точность по номерам заданий</h2><p class="muted" style="margin:4px 0 0;font-size:14px">${tot?(weak.length?"Слабые места: "+weak.map(w=>"№"+w.n+" ("+w.p+" %)").join(", ")+".":"Решите хотя бы по 3 задания каждого номера, чтобы увидеть слабые места."):"Пока пусто. Решите несколько заданий во вкладке «Задания 1–13» или вариант целиком: здесь появятся столбцы по каждому номеру."}</p></div>
     <div class="chart" id="chart"></div>
     <details><summary>Показать таблицей</summary><div class="tw"><table><tr><th>№</th><th>Тема</th><th>Верно</th><th>Всего</th><th>Точность</th></tr>${rows.map(r=>`<tr><td>${r.n}</td><td>${TOPIC[r.n]}</td><td>${r.ok}</td><td>${r.total}</td><td>${r.p==null?"—":r.p+" %"}</td></tr>`).join("")}</table></div></details>
-    ${ST.variants.length?`<div><h2 style="font-size:20px">Варианты</h2><div class="tw"><table><tr><th>Дата</th><th>Баллы</th><th>Время</th></tr>${ST.variants.slice().reverse().slice(0,10).map(v=>`<tr><td>${v.d}</td><td>${v.score}/12</td><td>${Math.floor(v.secs/60)} мин</td></tr>`).join("")}</table></div></div>`:""}
+    ${ST.variants.length?`<div><h2 style="font-size:20px">Варианты</h2><div class="tw"><table><tr><th>Дата</th><th>Баллы</th><th>Время</th></tr>${ST.variants.slice().reverse().slice(0,10).map(v=>`<tr><td>${v.d}</td><td>${v.score}/${NT}</td><td>${Math.floor(v.secs/60)} мин</td></tr>`).join("")}</table></div></div>`:""}
     <div class="row" id="reset"><button class="btn ghost" id="rs">Сбросить статистику</button></div>
   </section>`;
   drawChart(rows);
@@ -443,7 +589,7 @@ function Stats(){
     $("#yes").addEventListener("click",()=>{ST={tasks:{},days:[],cards:{},blitzBest:0,blitzRuns:0,variants:[],solved:0};save();Stats()});$("#no").addEventListener("click",Stats)});
 }
 function drawChart(rows){
-  const W=640,H=240,L=40,B=28,T=14,Rr=8,cw=(W-L-Rr)/12,bw=Math.min(30,cw-10);
+  const W=640,H=240,L=40,B=28,T=14,Rr=8,cw=(W-L-Rr)/NT,bw=Math.min(30,cw-10);
   const y=p=>T+(H-T-B)*(1-p/100);
   let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Точность по номерам заданий, проценты">`;
   [0,50,100].forEach(v=>{s+=`<line x1="${L}" x2="${W-Rr}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/><text x="${L-8}" y="${y(v)+4}" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="11" fill="var(--muted)">${v}%</text>`});

@@ -1,0 +1,468 @@
+<title>Профиль: тренажёр ЕГЭ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,600;7..72,700&family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<script>
+window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]},svg:{fontCache:"global"},startup:{typeset:false}};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" async onerror="window.__mjfail=1;var n=document.getElementById('mjnote');if(n)n.hidden=false"></script>
+<style>
+/* Layout: школьная тетрадь в клетку. Синяя ручка — действия и формулы, красная ручка проверяющего — ошибки и поля. Сверху вкладки режимов, под ними рабочий лист; ответ вписывается в клетки бланка, как на экзамене. */
+:root{
+  --paper:#f5f8fc; --sheet:#ffffff; --grid:#dfe8f3; --ink:#1c2433; --muted:#5f6b7d;
+  --pen:#2346c9; --pen-soft:#e6ecfb; --red:#cc3a3a; --red-soft:#fbe9e9; --ok:#1f7a4d; --ok-soft:#e3f3ea;
+  --line:#cfd9e6;
+  --f-display:"Literata",Georgia,"Times New Roman",serif;
+  --f-body:"Golos Text","Segoe UI",system-ui,-apple-system,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#141c1a; --sheet:#1a2422; --grid:#22302d; --ink:#e7eee9; --muted:#9db0a8;
+  --pen:#8fb0ff; --pen-soft:#22304a; --red:#ff8a80; --red-soft:#3a2224; --ok:#7fd3a3; --ok-soft:#1d3329;
+  --line:#2c3b38; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#141c1a; --sheet:#1a2422; --grid:#22302d; --ink:#e7eee9; --muted:#9db0a8;
+  --pen:#8fb0ff; --pen-soft:#22304a; --red:#ff8a80; --red-soft:#3a2224; --ok:#7fd3a3; --ok-soft:#1d3329;
+  --line:#2c3b38; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background-color:var(--paper);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:22px 22px;color:var(--ink);font:16px/1.55 var(--f-body);padding-inline:16px;padding-block:0}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--pen);outline-offset:2px}
+.app{max-width:960px;margin:0 auto;padding-block:20px 60px;display:grid;gap:16px}
+
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px 20px}
+.brand{display:grid;gap:2px}
+.brand small{font:600 11px/1 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--red)}
+.brand h1{font:700 clamp(26px,4.4vw,40px)/1.05 var(--f-display);margin:0;letter-spacing:-.01em}
+.facts{font:12px/1.5 var(--f-mono);color:var(--muted);text-align:right}
+
+nav.tabs{display:flex;flex-wrap:wrap;gap:6px;position:sticky;top:env(safe-area-inset-top,0px);z-index:4;padding-block:8px;background:var(--paper)}
+.tab{border:1px solid var(--line);background:var(--sheet);padding:8px 14px;cursor:pointer;font-weight:600;font-size:15px}
+.tab[aria-selected="true"]{background:var(--pen);border-color:var(--pen);color:var(--sheet)}
+
+.sheet{background:var(--sheet);border:1px solid var(--line);position:relative;padding-block:22px 26px;padding-inline:clamp(18px,4vw,36px) clamp(16px,3vw,32px);display:grid;gap:16px;min-width:0}
+.sheet.margin{padding-left:clamp(44px,7vw,64px)}
+.sheet.margin::before{content:"";position:absolute;top:0;bottom:0;left:clamp(30px,5vw,46px);width:1.5px;background:var(--red);opacity:.55}
+.eyebrow{font:600 12px/1.2 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center}
+.num{display:inline-grid;place-items:center;min-width:34px;height:34px;padding:0 6px;border:2px solid var(--pen);color:var(--pen);font:700 16px var(--f-mono)}
+h2{font:700 clamp(20px,3vw,26px)/1.2 var(--f-display);margin:0;text-wrap:balance}
+.q{font-size:18px;line-height:1.65;max-width:62ch;overflow-wrap:anywhere;min-width:0}
+mjx-container{max-width:100%;overflow-x:auto;overflow-y:hidden}
+.card .back,.blitz-stmt{overflow-wrap:anywhere;max-width:100%}
+.mjnote{font:12px var(--f-mono);color:var(--red)}
+.q mjx-container{font-size:105%!important}
+.muted{color:var(--muted)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{border:1px solid var(--pen);background:var(--sheet);color:var(--pen);padding:9px 16px;cursor:pointer;font-weight:600}
+.btn.primary{background:var(--pen);color:var(--sheet)}
+.btn.ghost{border-color:var(--line);color:var(--muted)}
+.btn.danger{border-color:var(--red);color:var(--red)}
+.btn:disabled{opacity:.45;cursor:default}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--sheet);padding:5px 10px;cursor:pointer;font:600 13px/1.2 var(--f-mono)}
+.chip[aria-pressed="true"]{border-color:var(--pen);background:var(--pen-soft);color:var(--pen)}
+
+/* бланк ответов */
+.blank{position:relative;display:inline-flex;max-width:100%;overflow-x:auto}
+.blank input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:text;font-size:16px}
+.cells{display:flex}
+.cell{width:30px;height:40px;border:1.5px solid var(--ink);margin-right:-1.5px;display:grid;place-items:center;font:600 22px var(--f-mono);color:var(--pen);background:var(--sheet)}
+.cell.cur{background:var(--pen-soft)}
+.blank.focus .cell.cur{box-shadow:inset 0 -3px 0 var(--pen)}
+.blank-label{font:12px var(--f-mono);color:var(--muted)}
+.verdict{padding:10px 14px;border-left:3px solid var(--pen);background:var(--pen-soft)}
+.verdict.ok{border-color:var(--ok);background:var(--ok-soft)}
+.verdict.bad{border-color:var(--red);background:var(--red-soft)}
+.verdict b{display:block;margin-bottom:2px}
+
+/* карточки формул */
+.card{border:1.5px solid var(--ink);background:var(--sheet);min-height:210px;display:grid;place-items:center;text-align:center;padding:24px;cursor:pointer;gap:10px}
+.card .front{font:700 clamp(20px,3vw,26px)/1.25 var(--f-display);max-width:28ch;text-wrap:balance}
+.card .back{font-size:22px;color:var(--pen)}
+.card .topic{font:600 11px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--red)}
+.boxes{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.box{border:1px solid var(--line);padding:8px;display:grid;gap:2px;text-align:center}
+.box b{font:700 20px var(--f-mono)}
+.box span{font:11px var(--f-mono);color:var(--muted)}
+
+/* блиц */
+.blitz-stmt{border:1.5px solid var(--ink);min-height:140px;display:grid;place-items:center;padding:20px;font-size:24px;text-align:center}
+.timer{font:700 34px/1 var(--f-mono);font-variant-numeric:tabular-nums;color:var(--pen)}
+.timer.low{color:var(--red)}
+.big2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.big2 .btn{padding:16px;font-size:18px}
+
+/* статистика */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.tile{border:1px solid var(--line);padding:12px 14px;display:grid;gap:2px}
+.tile b{font:700 26px/1.1 var(--f-mono);font-variant-numeric:tabular-nums}
+.tile span{font-size:13px;color:var(--muted)}
+.chart{position:relative}
+.chart svg{display:block;width:100%;height:auto}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--sheet);font:12px/1.4 var(--f-mono);padding:6px 8px;white-space:nowrap;transform:translate(-50%,-110%)}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font:600 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.tw{overflow-x:auto}
+.mark-ok{color:var(--ok);font-weight:700}.mark-bad{color:var(--red);font-weight:700}
+.vlist{display:grid;gap:14px}
+.vitem{border-top:1px dashed var(--line);padding-top:14px;display:grid;gap:10px}
+details summary{cursor:pointer;color:var(--pen);font-weight:600}
+@media (prefers-reduced-motion:no-preference){.card{transition:transform .15s}.card:active{transform:scale(.99)}}
+@media (max-width:520px){.facts{text-align:left}.cell{width:26px;height:36px;font-size:19px}.q{font-size:17px}}
+</style>
+
+<div class="app">
+  <header class="top">
+    <div class="brand"><small>ЕГЭ · математика · профиль</small><h1>Профиль: тренажёр</h1></div>
+    <div class="facts">19 заданий · 12 с кратким ответом<br>235 минут · минимум 27 баллов</div>
+  </header>
+  <nav class="tabs" role="tablist" aria-label="Режимы">
+    <button class="tab" role="tab" data-v="train">Задания 1–12</button>
+    <button class="tab" role="tab" data-v="variant">Вариант</button>
+    <button class="tab" role="tab" data-v="cards">Формулы</button>
+    <button class="tab" role="tab" data-v="blitz">Блиц</button>
+    <button class="tab" role="tab" data-v="stats">Статистика</button>
+  </nav>
+  <p class="mjnote" id="mjnote" hidden>Библиотека формул не загрузилась, поэтому формулы показаны в записи TeX. Обновите страницу.</p>
+  <main id="view"></main>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=(s,r=document)=>r.querySelector(s);
+const T=String.raw;
+const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const rnd=(x,d=6)=>Math.round(x*10**d)/10**d;
+const fmt=x=>String(rnd(x)).replace(".",",");
+const sg=(c,first)=>{c=rnd(c);if(first)return String(c).replace(".",",");return (c<0?" - ":" + ")+String(Math.abs(c)).replace(".",",")};
+const term=(c,v,first)=>{if(c===0)return"";const a=Math.abs(c);const body=(a===1?"":String(a))+v;return first?(c<0?"-":"")+body:(c<0?" - ":" + ")+body};
+const lin=(v,c)=>c===0?v:v+(c<0?" - "+Math.abs(c):" + "+c);
+function typeset(el){if(window.MathJax&&MathJax.typesetPromise){MathJax.typesetPromise([el]).catch(()=>{})}else{setTimeout(()=>{if(window.MathJax&&MathJax.typesetPromise)MathJax.typesetPromise([el]).catch(()=>{})},700)}}
+
+/* ================= ЗАДАНИЯ 1–12 ================= */
+const TOPIC={1:"Планиметрия",2:"Векторы",3:"Стереометрия",4:"Теория вероятностей",5:"Вероятности сложных событий",6:"Простейшие уравнения",7:"Вычисления и преобразования",8:"Производная",9:"Задача с прикладным содержанием",10:"Текстовая задача",11:"Графики функций",12:"Наибольшее и наименьшее значение"};
+const GEN={
+1:[()=>{const p=pick([0.2,0.4,0.6,0.8,0.25,0.75]);const c=(p===0.25||p===0.75)?4*R(1,10):5*R(1,10);const a=c*p;
+    return{q:T`В треугольнике \(ABC\) угол \(C\) равен \(90^\circ\), \(AB=${c}\), \(\sin A=${fmt(p)}\). Найдите \(BC\).`,a,sol:T`\(BC=AB\cdot\sin A=${c}\cdot${fmt(p)}=${fmt(a)}\).`}},
+   ()=>{const d=R(15,70);return{q:T`Центральный угол на \(${d}^\circ\) больше острого вписанного угла, опирающегося на ту же дугу окружности. Найдите вписанный угол. Ответ дайте в градусах.`,a:d,sol:T`Центральный угол вдвое больше вписанного: \(2x-x=${d}\), \(x=${d}^\circ\).`}},
+   ()=>{const a=R(3,15),b=a+2*R(1,6),h=R(2,12);const s=(a+b)/2*h;return{q:T`Основания трапеции равны \(${a}\) и \(${b}\), высота равна \(${h}\). Найдите площадь трапеции.`,a:s,sol:T`\(S=\frac{a+b}{2}\cdot h=\frac{${a}+${b}}{2}\cdot${h}=${s}\).`}},
+   ()=>{const v=2*R(10,70);const x=(180-v)/2;return{q:T`В равнобедренном треугольнике \(ABC\) с основанием \(AC\) угол \(B\) равен \(${v}^\circ\). Найдите угол \(C\). Ответ дайте в градусах.`,a:x,sol:T`Углы при основании равны: \(\frac{180^\circ-${v}^\circ}{2}=${x}^\circ\).`}}],
+2:[()=>{const a=[R(-6,6),R(-6,6)],b=[R(-6,6),R(-6,6)];const s=a[0]*b[0]+a[1]*b[1];return{q:T`Даны векторы \(\vec a(${a[0]};${a[1]})\) и \(\vec b(${b[0]};${b[1]})\). Найдите скалярное произведение \(\vec a\cdot\vec b\).`,a:s,sol:T`\(\vec a\cdot\vec b=x_1x_2+y_1y_2=${a[0]}\cdot(${b[0]})+${a[1]}\cdot(${b[1]})=${s}\).`}},
+   ()=>{const t=pick([[3,4,5],[4,3,5],[6,8,10],[8,6,10],[5,12,13],[12,5,13]]);const sx=t[0]*pick([1,-1]),sy=t[1]*pick([1,-1]);const a=[R(-5,5),R(-5,5)];const b=[sx-a[0],sy-a[1]];
+    return{q:T`Даны векторы \(\vec a(${a[0]};${a[1]})\) и \(\vec b(${b[0]};${b[1]})\). Найдите длину вектора \(\vec a+\vec b\).`,a:t[2],sol:T`\(\vec a+\vec b=(${sx};${sy})\), \(|\vec a+\vec b|=\sqrt{${sx}^2+${sy}^2}=${t[2]}\).`}}],
+3:[()=>{const V=R(2,30),k=pick([2,3]);return{q:T`Объём цилиндра равен \(${V}\). Радиус основания увеличили в \(${k}\) раза, высоту оставили прежней. Найдите объём нового цилиндра.`,a:V*k*k,sol:T`\(V=\pi R^2h\): при увеличении радиуса в \(${k}\) раза объём растёт в \(${k*k}\) раз: \(${V}\cdot${k*k}=${V*k*k}\).`}},
+   ()=>{const a=R(1,9),b=R(1,9),c=R(1,9);const s=2*(a*b+b*c+a*c);return{q:T`Измерения прямоугольного параллелепипеда равны \(${a}\), \(${b}\) и \(${c}\). Найдите площадь его поверхности.`,a:s,sol:T`\(S=2(ab+bc+ac)=2(${a*b}+${b*c}+${a*c})=${s}\).`}},
+   ()=>{const V=3*R(3,40);return{q:T`Цилиндр и конус имеют общие основание и высоту. Объём цилиндра равен \(${V}\). Найдите объём конуса.`,a:V/3,sol:T`\(V_{кон}=\frac13\pi R^2h=\frac13 V_{цил}=${V/3}\).`}}],
+4:[()=>{const N=pick([20,25,40,50]);const K=R(1,N/5);const p=(N-K)/N;return{q:T`В сборнике билетов по биологии всего ${N} билетов, в ${K} из них встречается вопрос о грибах. Найдите вероятность того, что в случайно выбранном на экзамене билете вопроса о грибах не будет.`,a:p,sol:T`\(P=\frac{${N}-${K}}{${N}}=${fmt(p)}\).`}},
+   ()=>{const s=R(3,11);const c=6-Math.abs(s-7);const p=Math.round(c/36*100)/100;return{q:T`В случайном эксперименте бросают две игральные кости. Найдите вероятность того, что в сумме выпадет ${s} очков. Результат округлите до сотых.`,a:p,sol:T`Всего \(36\) исходов, благоприятных \(${c}\): \(\frac{${c}}{36}\approx${fmt(p)}\).`}},
+   ()=>{const n=pick([2,3]);const k=R(0,n);const C=n===2?[1,2,1][k]:[1,3,3,1][k];const p=C/2**n;return{q:T`Симметричную монету бросают ${n===2?"дважды":"трижды"}. Найдите вероятность того, что ${k===0?"орёл не выпадет ни разу":"орёл выпадет ровно "+k+" "+(k===1?"раз":"раза")}.`,a:p,sol:T`Всего \(${2**n}\) исходов, благоприятных \(${C}\): \(\frac{${C}}{${2**n}}=${fmt(p)}\).`}}],
+5:[()=>{const p1=pick([0.97,0.95,0.93,0.9]),p2=pick([0.89,0.85,0.81,0.8,0.75]);const p=rnd(p1-p2);return{q:T`Вероятность того, что новый электрический чайник прослужит больше года, равна ${fmt(p1)}. Вероятность того, что он прослужит больше двух лет, равна ${fmt(p2)}. Найдите вероятность того, что он прослужит больше года, но меньше двух лет.`,a:p,sol:T`События «больше двух лет» и «от года до двух» несовместны и в сумме дают «больше года»: \(${fmt(p1)}-${fmt(p2)}=${fmt(p)}\).`}},
+   ()=>{const p=pick([0.8,0.7,0.9,0.6]);const r=rnd(p*p*(1-p));return{q:T`Биатлонист три раза стреляет по мишеням. Вероятность попадания при одном выстреле равна ${fmt(p)}. Найдите вероятность того, что первые два раза он попал, а последний раз промахнулся.`,a:r,sol:T`Выстрелы независимы: \(${fmt(p)}\cdot${fmt(p)}\cdot${fmt(rnd(1-p))}=${fmt(r)}\).`}},
+   ()=>{const q=pick([0.1,0.2,0.3,0.05]);const r=rnd(1-q*q);return{q:T`В магазине стоят два платёжных автомата. Каждый из них может быть неисправен с вероятностью ${fmt(q)} независимо от другого. Найдите вероятность того, что хотя бы один автомат исправен.`,a:r,sol:T`Оба неисправны с вероятностью \(${fmt(q)}^2=${fmt(rnd(q*q))}\), значит \(1-${fmt(rnd(q*q))}=${fmt(r)}\).`}}],
+6:[()=>{const a=pick([2,3,5]);const c=R(1,a===2?6:3);const b=R(1,9);const v=a**c;return{q:T`Найдите корень уравнения \(${a}^{x-${b}}=${v}\).`,a:b+c,sol:T`\(${v}=${a}^{${c}}\), значит \(x-${b}=${c}\), \(x=${b+c}\).`}},
+   ()=>{const a=pick([2,3,5]);const c=R(1,a===5?2:4);const b=R(1,9);const x=a**c-b;return{q:T`Найдите корень уравнения \(\log_{${a}}(${lin("x",b)})=${c}\).`,a:x,sol:T`\(${lin("x",b)}=${a}^{${c}}=${a**c}\), \(x=${x}\).`}},
+   ()=>{const a=R(1,5),c=R(2,9),x=R(1,15);const b=c*c-a*x;const inner=(a===1?"x":a+"x")+(b===0?"":b<0?" - "+(-b):" + "+b);return{q:T`Найдите корень уравнения \(\sqrt{${inner}}=${c}\).`,a:x,sol:T`\(${inner}=${c*c}\), \(${a===1?"":a}x=${a*x}\), \(x=${x}\).`}},
+   ()=>{const a=R(-9,9),k=R(1,6),b=a+2*k;const x=a+k;return{q:T`Найдите корень уравнения \((${lin("x",-a)})^2=(${lin("x",-b)})^2\).`,a:x,sol:T`Корни \(x=${a}\) и \(x=${b}\) не подходят одновременно, поэтому \(${lin("x",-a)}=-(${lin("x",-b)})\), \(2x=${a+b}\), \(x=${x}\).`}}],
+7:[()=>{const n=pick([2,3,4,5,6,7]),k=R(2,n<=3?5:3);const m=n**k;return{q:T`Найдите значение выражения \(\dfrac{\log_3 ${m}}{\log_3 ${n}}\).`,a:k,sol:T`\(\log_3 ${m}=\log_3 ${n}^{${k}}=${k}\log_3 ${n}\), ответ \(${k}\).`}},
+   ()=>{const a=pick([2,3,5,7]);const p=R(2,9),q=R(2,9),e=R(1,2);const r=p+q-e;return{q:T`Найдите значение выражения \(\dfrac{${a}^{${p}}\cdot ${a}^{${q}}}{${a}^{${r}}}\).`,a:a**e,sol:T`\(${a}^{${p}+${q}-${r}}=${a}^{${e}}=${a**e}\).`}},
+   ()=>{const k=R(2,40);return pick([{q:T`Найдите значение выражения \(${k}\sqrt{2}\cos\dfrac{\pi}{4}\).`,a:k,sol:T`\(\cos\frac{\pi}{4}=\frac{\sqrt2}{2}\), \(${k}\sqrt2\cdot\frac{\sqrt2}{2}=${k}\).`},{q:T`Найдите значение выражения \(${k}\sqrt{3}\,\operatorname{tg}\dfrac{\pi}{3}\).`,a:3*k,sol:T`\(\operatorname{tg}\frac{\pi}{3}=\sqrt3\), \(${k}\sqrt3\cdot\sqrt3=${3*k}\).`}])},
+   ()=>{const t=pick([[3,4,5],[4,3,5],[5,12,13],[12,5,13]]);const Q=pick(["II","IV"]);const cosS=Q==="II"?-1:1,sinS=Q==="II"?1:-1;const iv=Q==="II"?T`\left(\frac{\pi}{2};\pi\right)`:T`\left(\frac{3\pi}{2};2\pi\right)`;const a=sinS*t[1];
+    return{q:T`Найдите \(${t[2]}\sin\alpha\), если \(\cos\alpha=${cosS<0?"-":""}\frac{${t[0]}}{${t[2]}}\) и \(\alpha\in${iv}\).`,a,sol:T`\(\sin^2\alpha=1-\frac{${t[0]*t[0]}}{${t[2]*t[2]}}=\frac{${t[1]*t[1]}}{${t[2]*t[2]}}\). В этой четверти синус ${sinS>0?"положителен":"отрицателен"}: \(${t[2]}\sin\alpha=${a}\).`}}],
+8:[()=>{const a=pick([1,2]),b=R(-6,6),c=R(-9,9),d=R(1,20),t=R(1,5);const v=3*a*t*t+2*b*t+c;const poly=term(a,"t^3",true)+term(b,"t^2")+term(c,"t")+sg(d);
+    return{q:T`Материальная точка движется прямолинейно по закону \(x(t)=${poly}\), где \(x\) — расстояние от точки отсчёта в метрах, \(t\) — время в секундах. Найдите её скорость (в м/с) в момент времени \(t=${t}\) с.`,a:v,sol:T`\(v(t)=x'(t)=${3*a}t^2${term(2*b,"t")}${c?sg(c):""}\), \(v(${t})=${v}\).`}},
+   ()=>{const a=R(-4,4)||1,b=R(-9,9),c=R(-9,9),x0=R(-4,4);const k=2*a*x0+b;return{q:T`Найдите угловой коэффициент касательной к графику функции \(f(x)=${term(a,"x^2",true)}${term(b,"x")}${c?sg(c):""}\) в точке с абсциссой \(x_0=${x0}\).`,a:k,sol:T`\(k=f'(x_0)=${2*a}x_0${b?sg(b):""}=${k}\).`}}],
+9:[()=>{let r1,r2,H,h0;do{r1=pick([0.2,0.4,0.6,0.8]);r2=pick([1.2,1.4,1.6,1.8,2]);H=pick([3,4,5,6]);h0=rnd(H-5*r1*r2)}while(h0<0.5||h0>3);const v=rnd(5*(r1+r2));const ans=rnd(r2-r1);
+    return{q:T`Высота над землёй подброшенного вверх мяча меняется по закону \(h(t)=${fmt(h0)}+${fmt(v)}t-5t^2\), где \(h\) — высота в метрах, \(t\) — время в секундах. Сколько секунд мяч будет находиться на высоте не менее ${H} метров?`,a:ans,sol:T`\(${fmt(h0)}+${fmt(v)}t-5t^2\ge${H}\) \(\Leftrightarrow\) \(5t^2-${fmt(v)}t+${fmt(rnd(H-h0))}\le0\), корни \(${fmt(r1)}\) и \(${fmt(r2)}\). Время: \(${fmt(r2)}-${fmt(r1)}=${fmt(ans)}\).`}},
+   ()=>{const I=R(2,9),Rr=R(2,15);const P=I*I*Rr;return{q:T`Мощность постоянного тока (в ваттах) вычисляется по формуле \(P=I^2R\), где \(I\) — сила тока (в амперах), \(R\) — сопротивление (в омах). Пользуясь этой формулой, найдите сопротивление \(R\), если мощность составляет ${P} Вт, а сила тока равна ${I} А. Ответ дайте в омах.`,a:Rr,sol:T`\(R=\frac{P}{I^2}=\frac{${P}}{${I*I}}=${Rr}\).`}}],
+10:[()=>{const p=pick([[12,4],[6,3],[20,30],[10,15],[12,6],[36,12],[24,8],[30,15]]);const t=p[0]*p[1]/(p[0]+p[1]);return{q:T`Первая труба наполняет бак за ${p[0]} минут, вторая — за ${p[1]} минут. За сколько минут наполнят бак обе трубы, работая одновременно?`,a:t,sol:T`За минуту обе трубы наполняют \(\frac1{${p[0]}}+\frac1{${p[1]}}=\frac{1}{${t}}\) бака, ответ \(${t}\).`}},
+   ()=>{let x,y,p,q,c;do{x=R(2,10);y=R(2,10);p=pick([10,20,30,40,15,25]);q=pick([10,20,30,40,15,25,50]);c=(x*p+y*q)/(x+y)}while(p===q||!Number.isInteger(rnd(c*100,4)));return{q:T`Смешали ${x} литров ${p}-процентного водного раствора некоторого вещества с ${y} литрами ${q}-процентного раствора этого же вещества. Сколько процентов составляет концентрация получившегося раствора?`,a:rnd(c),sol:T`\(\frac{${x}\cdot${p}+${y}\cdot${q}}{${x}+${y}}=\frac{${x*p+y*q}}{${x+y}}=${fmt(c)}\%\).`}},
+   ()=>{let v,d,t,L;do{v=R(8,25);d=R(2,8);t=pick([1,2]);L=t*v*(v+d)/d}while(!Number.isInteger(L)||L<40||L>300);return{q:T`Два велосипедиста одновременно отправились в пробег протяжённостью ${L} км. Первый ехал со скоростью на ${d} км/ч большей, чем второй, и прибыл к финишу на ${t} ч раньше второго. Найдите скорость велосипедиста, пришедшего к финишу вторым. Ответ дайте в км/ч.`,a:v,sol:T`\(\frac{${L}}{v}-\frac{${L}}{v+${d}}=${t}\). Подходит положительный корень \(v=${v}\).`}}],
+11:[()=>{let k,a,ds;do{k=pick([1,-1])*pick([4,6,8,12,18,24]);a=R(-6,6);ds=[];for(let i=1;i<=Math.abs(k);i++)if(k%i===0){ds.push(i,-i)}}while(ds.length<6);
+    const xs=[];while(xs.length<3){const x=pick(ds);if(!xs.includes(x))xs.push(x)}const f=x=>k/x+a;
+    return{q:T`График функции \(f(x)=\dfrac{k}{x}+a\) проходит через точки \(A(${xs[0]};\,${f(xs[0])})\) и \(B(${xs[1]};\,${f(xs[1])})\). Найдите \(f(${xs[2]})\).`,a:f(xs[2]),sol:T`Из двух условий: \(k=${k}\), \(a=${a}\). Тогда \(f(${xs[2]})=\frac{${k}}{${xs[2]}}${a<0?"-"+(-a):"+"+a}=${f(xs[2])}\).`}},
+   ()=>{const a=pick([1,2,-1,-2,3]),p=R(-4,4),q=R(-6,6),t=p+pick([-3,-2,2,3]);const f=x=>a*(x-p)**2+q;return{q:T`Парабола \(y=ax^2+bx+c\) имеет вершину в точке \((${p};\,${q})\) и проходит через точку \((${p+1};\,${f(p+1)})\). Найдите значение функции при \(x=${t}\).`,a:f(t),sol:T`\(y=a(x-${p})^2${q<0?q:"+"+q}\), из второй точки \(a=${a}\). \(y(${t})=${a}\cdot${(t-p)**2}${q<0?q:"+"+q}=${f(t)}\).`}}],
+12:[()=>{const a=R(1,6),c=R(-20,20);return{q:T`Найдите точку максимума функции \(y=x^3-${3*a*a}x${c?sg(c):""}\).`,a:-a,sol:T`\(y'=3x^2-${3*a*a}=0\), \(x=\pm${a}\). Производная меняет знак с «+» на «−» в точке \(x=-${a}\).`}},
+   ()=>{const m=R(1,4),c=R(-10,60);return{q:T`Найдите наименьшее значение функции \(y=x^3-${3*m*m}x${c?sg(c):""}\) на отрезке \([0;\,${m+1}]\).`,a:c-2*m**3,sol:T`\(y'=3x^2-${3*m*m}\), на отрезке критическая точка \(x=${m}\) — минимум. \(y(${m})=${m**3}-${3*m**3}${c?sg(c):""}=${c-2*m**3}\).`}}]
+};
+function genTask(n){const t=pick(GEN[n])();t.n=n;t.topic=TOPIC[n];return t}
+
+/* ================= ФОРМУЛЫ ================= */
+const F=[
+["Тригонометрия","Основное тригонометрическое тождество",T`\sin^2\alpha+\cos^2\alpha=1`],
+["Тригонометрия","Тангенс через синус и косинус",T`\operatorname{tg}\alpha=\dfrac{\sin\alpha}{\cos\alpha}`],
+["Тригонометрия","Связь тангенса и косинуса",T`1+\operatorname{tg}^2\alpha=\dfrac{1}{\cos^2\alpha}`],
+["Тригонометрия","Синус двойного угла",T`\sin2\alpha=2\sin\alpha\cos\alpha`],
+["Тригонометрия","Косинус двойного угла",T`\cos2\alpha=\cos^2\alpha-\sin^2\alpha=2\cos^2\alpha-1=1-2\sin^2\alpha`],
+["Тригонометрия","Синус суммы",T`\sin(\alpha+\beta)=\sin\alpha\cos\beta+\cos\alpha\sin\beta`],
+["Тригонометрия","Косинус суммы",T`\cos(\alpha+\beta)=\cos\alpha\cos\beta-\sin\alpha\sin\beta`],
+["Тригонометрия","Решение уравнения sin x = a",T`x=(-1)^n\arcsin a+\pi n,\ n\in\mathbb Z`],
+["Тригонометрия","Решение уравнения cos x = a",T`x=\pm\arccos a+2\pi n,\ n\in\mathbb Z`],
+["Тригонометрия","Решение уравнения tg x = a",T`x=\operatorname{arctg}a+\pi n,\ n\in\mathbb Z`],
+["Тригонометрия","Значения sin и cos для 30°, 45°, 60°",T`\sin30^\circ=\tfrac12,\ \sin45^\circ=\tfrac{\sqrt2}{2},\ \sin60^\circ=\tfrac{\sqrt3}{2}`],
+["Логарифмы","Основное логарифмическое тождество",T`a^{\log_a b}=b`],
+["Логарифмы","Логарифм произведения",T`\log_a(bc)=\log_a b+\log_a c`],
+["Логарифмы","Логарифм частного",T`\log_a\dfrac{b}{c}=\log_a b-\log_a c`],
+["Логарифмы","Логарифм степени",T`\log_a b^k=k\log_a b`],
+["Логарифмы","Переход к новому основанию",T`\log_a b=\dfrac{\log_c b}{\log_c a}`],
+["Логарифмы","Степень в основании",T`\log_{a^k}b=\dfrac1k\log_a b`],
+["Степени","Произведение степеней",T`a^m\cdot a^n=a^{m+n}`],
+["Степени","Частное степеней",T`\dfrac{a^m}{a^n}=a^{m-n}`],
+["Степени","Степень степени",T`(a^m)^n=a^{mn}`],
+["Степени","Отрицательный показатель",T`a^{-n}=\dfrac{1}{a^n}`],
+["Степени","Дробный показатель",T`a^{\frac mn}=\sqrt[n]{a^m}`],
+["Алгебра","Дискриминант",T`D=b^2-4ac`],
+["Алгебра","Корни квадратного уравнения",T`x_{1,2}=\dfrac{-b\pm\sqrt D}{2a}`],
+["Алгебра","Теорема Виета",T`x_1+x_2=-\dfrac ba,\quad x_1x_2=\dfrac ca`],
+["Алгебра","Квадрат суммы",T`(a+b)^2=a^2+2ab+b^2`],
+["Алгебра","Разность квадратов",T`a^2-b^2=(a-b)(a+b)`],
+["Прогрессии","n-й член арифметической прогрессии",T`a_n=a_1+d(n-1)`],
+["Прогрессии","Сумма арифметической прогрессии",T`S_n=\dfrac{(a_1+a_n)\,n}{2}`],
+["Прогрессии","n-й член геометрической прогрессии",T`b_n=b_1q^{\,n-1}`],
+["Прогрессии","Сумма геометрической прогрессии",T`S_n=\dfrac{b_1(q^n-1)}{q-1}`],
+["Производные","Производная степени",T`(x^n)'=nx^{n-1}`],
+["Производные","Производные синуса и косинуса",T`(\sin x)'=\cos x,\quad(\cos x)'=-\sin x`],
+["Производные","Производные e^x и ln x",T`(e^x)'=e^x,\quad(\ln x)'=\dfrac1x`],
+["Производные","Производная показательной функции",T`(a^x)'=a^x\ln a`],
+["Производные","Производная произведения",T`(uv)'=u'v+uv'`],
+["Производные","Производная частного",T`\left(\dfrac uv\right)'=\dfrac{u'v-uv'}{v^2}`],
+["Производные","Уравнение касательной",T`y=f(x_0)+f'(x_0)(x-x_0)`],
+["Производные","Геометрический смысл производной",T`f'(x_0)=k=\operatorname{tg}\alpha`],
+["Планиметрия","Теорема Пифагора",T`c^2=a^2+b^2`],
+["Планиметрия","Площадь треугольника через высоту",T`S=\tfrac12 a h_a`],
+["Планиметрия","Площадь треугольника через синус",T`S=\tfrac12 ab\sin\gamma`],
+["Планиметрия","Формула Герона",T`S=\sqrt{p(p-a)(p-b)(p-c)}`],
+["Планиметрия","Теорема синусов",T`\dfrac{a}{\sin\alpha}=\dfrac{b}{\sin\beta}=\dfrac{c}{\sin\gamma}=2R`],
+["Планиметрия","Теорема косинусов",T`c^2=a^2+b^2-2ab\cos\gamma`],
+["Планиметрия","Площадь трапеции",T`S=\dfrac{a+b}{2}\cdot h`],
+["Планиметрия","Длина окружности и площадь круга",T`C=2\pi R,\quad S=\pi R^2`],
+["Планиметрия","Вписанный угол",T`\angle_{вп}=\tfrac12\angle_{центр}`],
+["Планиметрия","Радиус вписанной окружности прямоугольного треугольника",T`r=\dfrac{a+b-c}{2}`],
+["Стереометрия","Объём призмы",T`V=S_{осн}\cdot h`],
+["Стереометрия","Объём пирамиды",T`V=\tfrac13 S_{осн}\cdot h`],
+["Стереометрия","Объём цилиндра",T`V=\pi R^2h`],
+["Стереометрия","Объём конуса",T`V=\tfrac13\pi R^2h`],
+["Стереометрия","Объём шара",T`V=\tfrac43\pi R^3`],
+["Стереометрия","Площадь сферы",T`S=4\pi R^2`],
+["Стереометрия","Боковая поверхность цилиндра",T`S_{бок}=2\pi Rh`],
+["Стереометрия","Боковая поверхность конуса",T`S_{бок}=\pi Rl`],
+["Вероятность","Классическая вероятность",T`P(A)=\dfrac mn`],
+["Вероятность","Вероятность суммы событий",T`P(A\cup B)=P(A)+P(B)-P(A\cap B)`],
+["Вероятность","Независимые события",T`P(A\cap B)=P(A)\cdot P(B)`],
+["Вероятность","Противоположное событие",T`P(\bar A)=1-P(A)`]
+].map((x,i)=>({id:"f"+i,topic:x[0],name:x[1],tex:x[2]}));
+const WRONG=[
+T`\sin2\alpha=2\sin\alpha`,T`\cos2\alpha=2\sin^2\alpha-1`,T`\sin^2\alpha-\cos^2\alpha=1`,T`\operatorname{tg}\alpha=\dfrac{\cos\alpha}{\sin\alpha}`,T`\sin(\alpha+\beta)=\sin\alpha+\sin\beta`,T`\cos(\alpha+\beta)=\cos\alpha\cos\beta+\sin\alpha\sin\beta`,
+T`\log_a(b+c)=\log_a b+\log_a c`,T`\log_a b^k=(\log_a b)^k`,T`\log_a b=\dfrac{\log_c a}{\log_c b}`,T`a^{\log_a b}=a`,
+T`a^m\cdot a^n=a^{mn}`,T`(a^m)^n=a^{m+n}`,T`a^{-n}=-a^n`,T`a^{\frac mn}=\sqrt[m]{a^n}`,
+T`(a+b)^2=a^2+b^2`,T`D=b^2+4ac`,T`x_1+x_2=\dfrac ba`,T`a^2-b^2=(a-b)^2`,
+T`a_n=a_1+dn`,T`S_n=(a_1+a_n)\,n`,T`b_n=b_1q^{\,n}`,
+T`(\cos x)'=\sin x`,T`(\ln x)'=\ln x`,T`(x^n)'=x^{n-1}`,T`(uv)'=u'v'`,T`(a^x)'=xa^{x-1}`,
+T`S=ab\sin\gamma`,T`c^2=a^2+b^2+2ab\cos\gamma`,T`S=(a+b)\cdot h`,T`C=\pi R`,
+T`V=\pi R^2h\ \text{(конус)}`,T`V=\tfrac34\pi R^3\ \text{(шар)}`,T`S=2\pi R^2\ \text{(сфера)}`,T`V=S_{осн}\cdot h\ \text{(пирамида)}`,
+T`P(A\cup B)=P(A)+P(B)\ \text{(всегда)}`,T`P(\bar A)=P(A)-1`
+];
+
+/* ================= ХРАНИЛИЩЕ ================= */
+const KEY="ege-math-profile-v1";
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.tasks)return s}catch(e){}return{tasks:{},days:[],cards:{},blitzBest:0,blitzRuns:0,variants:[],solved:0}}
+let ST=load();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(ST))}catch(e){}}
+function today(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function touch(){const t=today();if(!ST.days.includes(t)){ST.days.push(t);if(ST.days.length>400)ST.days.shift()}}
+function recordTask(n,ok){touch();const r=ST.tasks[n]||(ST.tasks[n]={ok:0,total:0});r.total++;if(ok)r.ok++;ST.solved++;save()}
+function streak(){const set=new Set(ST.days);let d=new Date(),k=0;const f=x=>x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0");if(!set.has(f(d)))d.setDate(d.getDate()-1);while(set.has(f(d))){k++;d.setDate(d.getDate()-1)}return k}
+
+/* ================= БЛАНК ОТВЕТА ================= */
+function blank(id){
+  return `<div class="row" style="gap:6px 12px"><label class="blank" id="${id}-wrap"><input id="${id}" inputmode="decimal" autocomplete="off" maxlength="12" aria-label="Ответ"><span class="cells">${Array.from({length:12},(_,i)=>`<span class="cell${i===0?" cur":""}"></span>`).join("")}</span></label><span class="blank-label">Бланк ответов №1: цифры, минус и запятая</span></div>`;
+}
+function wireBlank(id,onEnter){
+  const inp=$("#"+id),wrap=$("#"+id+"-wrap"),cells=[...wrap.querySelectorAll(".cell")];
+  const paint=()=>{let v=inp.value.replace(/\./g,",").replace(/[^0-9,\-]/g,"");if(v!==inp.value)inp.value=v;cells.forEach((c,i)=>{c.textContent=v[i]||"";c.classList.toggle("cur",i===Math.min(v.length,cells.length-1))})};
+  inp.addEventListener("input",paint);inp.addEventListener("focus",()=>wrap.classList.add("focus"));inp.addEventListener("blur",()=>wrap.classList.remove("focus"));
+  inp.addEventListener("keydown",e=>{if(e.key==="Enter"&&onEnter){e.preventDefault();onEnter()}});
+  paint();return inp;
+}
+function parseAns(s){s=(s||"").trim().replace(",",".");if(!/^-?\d+(\.\d+)?$/.test(s))return null;return parseFloat(s)}
+const same=(x,y)=>x!=null&&Math.abs(x-y)<1e-9;
+
+/* ================= ВКЛАДКИ ================= */
+let view="train",timers=[];
+function clearTimers(){timers.forEach(clearInterval);timers=[]}
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>show(b.dataset.v)));
+function show(v){view=v;clearTimers();document.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.v===v)));
+  ({train:Train,variant:Variant,cards:Cards,blitz:Blitz,stats:Stats})[v]();try{localStorage.setItem(KEY+"-tab",v)}catch(e){}}
+
+/* ---------- Задания 1–12 ---------- */
+let trainN=0,cur=null;
+function Train(){
+  cur=genTask(trainN||R(1,12));
+  const V=$("#view");
+  V.innerHTML=`<section class="sheet margin">
+    <div class="chips" role="group" aria-label="Номер задания"><button class="chip" aria-pressed="${trainN===0}" data-n="0">Любой</button>${Array.from({length:12},(_,i)=>`<button class="chip" aria-pressed="${trainN===i+1}" data-n="${i+1}">${i+1}</button>`).join("")}</div>
+    <div class="eyebrow"><span class="num">${cur.n}</span><span>${cur.topic}</span><span>1 первичный балл</span></div>
+    <div class="q" id="q">${cur.q}</div>
+    ${blank("ans")}
+    <div class="row"><button class="btn primary" id="check">Проверить</button><button class="btn ghost" id="skip">Другое задание</button></div>
+    <div id="res"></div>
+  </section>
+  <p class="muted" style="font-size:13px;margin:0">Задания составлены по типам первой части КИМ профильного ЕГЭ (открытый банк ФИПИ); числа генерируются заново каждый раз. В задании 11 на экзамене дан рисунок графика, здесь — его словесное описание.</p>`;
+  typeset($("#q"));
+  V.querySelectorAll(".chip").forEach(c=>c.addEventListener("click",()=>{trainN=+c.dataset.n;Train()}));
+  let done=false;
+  const check=()=>{if(done){Train();return}const v=parseAns(inp.value);if(v==null){$("#res").innerHTML=`<div class="verdict bad"><b>Ответ не распознан.</b>Впишите число: целое или десятичную дробь через запятую, например −2,5.</div>`;return}
+    done=true;const ok=same(v,cur.a);recordTask(cur.n,ok);
+    $("#res").innerHTML=`<div class="verdict ${ok?"ok":"bad"}"><b>${ok?"Верно":"Неверно. Правильный ответ: "+fmt(cur.a)}</b><span id="sol">${cur.sol}</span></div>`;typeset($("#sol"));
+    $("#check").textContent="Следующее задание";$("#check").focus()};
+  const inp=wireBlank("ans",check);
+  $("#check").addEventListener("click",check);$("#skip").addEventListener("click",Train);
+}
+
+/* ---------- Вариант ---------- */
+let VAR=null;
+function Variant(){
+  const V=$("#view");
+  if(!VAR||VAR.done){VAR={tasks:Array.from({length:12},(_,i)=>genTask(i+1)),start:Date.now(),done:false}}
+  const el=()=>{const s=Math.floor((Date.now()-VAR.start)/1000);return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")};
+  V.innerHTML=`<section class="sheet margin">
+    <div class="row" style="justify-content:space-between"><div><div class="eyebrow">Тренировочный вариант · часть 1</div><h2>Задания 1–12</h2></div><div class="timer" id="vt">${el()}</div></div>
+    <p class="muted" style="margin:0">На экзамене на всю работу даётся 235 минут. Первую часть стоит решать за 60–90 минут.</p>
+    <div class="vlist">${VAR.tasks.map((t,i)=>`<div class="vitem"><div class="eyebrow"><span class="num">${t.n}</span><span>${t.topic}</span><span id="m${i}"></span></div><div class="q">${t.q}</div>${blank("v"+i)}<div id="vs${i}"></div></div>`).join("")}</div>
+    <div class="row"><button class="btn primary" id="finish">Завершить и проверить</button><button class="btn ghost" id="newv">Новый вариант</button></div>
+    <div id="vres"></div>
+  </section>`;
+  typeset(V);
+  VAR.tasks.forEach((t,i)=>{const inp=wireBlank("v"+i,()=>{const nx=$("#v"+(i+1));if(nx)nx.focus()});if(VAR.answers)inp.value=VAR.answers[i]||"",inp.dispatchEvent(new Event("input"))});
+  if(!VAR.done)timers.push(setInterval(()=>{const t=$("#vt");if(t)t.textContent=el()},1000));
+  $("#newv").addEventListener("click",()=>{VAR=null;Variant()});
+  $("#finish").addEventListener("click",()=>{
+    if(VAR.done)return;VAR.done=true;clearTimers();const secs=Math.floor((Date.now()-VAR.start)/1000);
+    let score=0;VAR.answers=VAR.tasks.map((_,i)=>$("#v"+i).value);
+    VAR.tasks.forEach((t,i)=>{const v=parseAns(VAR.answers[i]);const ok=same(v,t.a);if(ok)score++;recordTask(t.n,ok);
+      $("#m"+i).innerHTML=ok?`<span class="mark-ok">+1</span>`:`<span class="mark-bad">0</span>`;
+      $("#vs"+i).innerHTML=`<div class="verdict ${ok?"ok":"bad"}"><b>${ok?"Верно":"Ответ: "+fmt(t.a)}</b><span>${t.sol}</span></div>`});
+    ST.variants.push({d:today(),score,secs});if(ST.variants.length>60)ST.variants.shift();save();
+    $("#vres").innerHTML=`<div class="verdict ${score>=6?"ok":"bad"}"><b>Первичный балл за часть 1: ${score} из 12</b>Время: ${Math.floor(secs/60)} мин ${secs%60} с. Минимальный порог профильного ЕГЭ — 27 тестовых баллов. Перевод первичных баллов в тестовые ФИПИ публикует каждый год, поэтому здесь показан только первичный балл.</div>`;
+    typeset(V);$("#finish").disabled=true;$("#vres").scrollIntoView({block:"center"});
+  });
+}
+
+/* ---------- Формулы (карточки Лейтнера) ---------- */
+const DAY=864e5,INT=[0,0,1,3,7,16];
+let topicF="Все",queue=[],flipped=false;
+function cardState(id){return ST.cards[id]||{box:1,due:0}}
+function buildQueue(force){const now=Date.now();queue=F.filter(f=>topicF==="Все"||f.topic===topicF).filter(f=>force||cardState(f.id).due<=now).sort((a,b)=>cardState(a.id).box-cardState(b.id).box||Math.random()-.5)}
+function Cards(){
+  buildQueue(false);flipped=false;renderCard();
+}
+function renderCard(){
+  const V=$("#view");const topics=["Все",...new Set(F.map(f=>f.topic))];
+  const counts=[1,2,3,4,5].map(b=>F.filter(f=>(topicF==="Все"||f.topic===topicF)&&cardState(f.id).box===b).length);
+  const c=queue[0];
+  V.innerHTML=`<section class="sheet">
+    <div class="chips" role="group" aria-label="Тема">${topics.map(t=>`<button class="chip" aria-pressed="${t===topicF}" data-t="${t}">${t}</button>`).join("")}</div>
+    ${c?`<div class="card" id="card" tabindex="0" role="button" aria-label="Перевернуть карточку">
+      <span class="topic">${c.topic} · коробка ${cardState(c.id).box}</span>
+      <div class="front">${c.name}</div>
+      <div class="back" id="back" ${flipped?"":"hidden"}>\\(${c.tex}\\)</div>
+      ${flipped?"":`<span class="muted" style="font-size:14px">Вспомните формулу и нажмите на карточку</span>`}
+    </div>
+    <div class="row">${flipped?`<button class="btn danger" id="no">Не вспомнил</button><button class="btn primary" id="yes">Помню</button>`:`<button class="btn primary" id="flip">Показать формулу</button>`}<span class="muted" style="font-size:14px">Осталось на сегодня: ${queue.length}</span></div>`
+    :`<div class="card" style="cursor:default"><div class="front">На сегодня всё повторено</div><span class="muted">Карточки вернутся по расписанию: через 1, 3, 7 и 16 дней.</span></div><div class="row"><button class="btn" id="again">Повторить все карточки темы</button></div>`}
+    <div><div class="eyebrow" style="margin-bottom:6px">Коробки Лейтнера: чем правее, тем прочнее выучено</div>
+    <div class="boxes">${counts.map((n,i)=>`<div class="box"><b>${n}</b><span>${["каждый раз","через день","через 3 дня","через неделю","через 16 дней"][i]}</span></div>`).join("")}</div></div>
+  </section>`;
+  V.querySelectorAll(".chip").forEach(b=>b.addEventListener("click",()=>{topicF=b.dataset.t;Cards()}));
+  if(!c){$("#again").addEventListener("click",()=>{buildQueue(true);flipped=false;renderCard()});return}
+  const flip=()=>{if(!flipped){flipped=true;renderCard()}};
+  $("#card").addEventListener("click",flip);$("#card").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();flip()}});
+  if(!flipped)$("#flip").addEventListener("click",flip);
+  else{typeset($("#back"));
+    const grade=ok=>{const s=cardState(c.id);s.box=ok?Math.min(5,s.box+1):1;s.due=Date.now()+INT[s.box]*DAY;ST.cards[c.id]=s;touch();save();queue.shift();if(!ok)queue.push(c);flipped=false;renderCard()};
+    $("#yes").addEventListener("click",()=>grade(true));$("#no").addEventListener("click",()=>grade(false));}
+}
+
+/* ---------- Блиц ---------- */
+function Blitz(){
+  const V=$("#view");
+  V.innerHTML=`<section class="sheet">
+    <div class="eyebrow">Блиц · 60 секунд</div><h2>Верно или неверно?</h2>
+    <p style="margin:0;max-width:60ch">На экране формула. Решите, верна ли она. Правильный ответ даёт +1, ошибка — −1 и показ верной формулы. Клавиши: ← неверно, → верно.</p>
+    <div class="row"><button class="btn primary" id="go">Начать</button><span class="muted">Рекорд: ${ST.blitzBest}</span></div>
+  </section>`;
+  $("#go").addEventListener("click",run);
+  function run(){
+    let left=60,score=0,n=0,item;
+    const nextItem=()=>{if(Math.random()<.5){const f=pick(F);item={tex:f.tex,ok:true,fix:null}}else{const w=pick(WRONG);item={tex:w,ok:false}}};
+    V.innerHTML=`<section class="sheet"><div class="row" style="justify-content:space-between"><div class="timer" id="bt">60</div><div class="timer" id="bs" style="color:var(--ink)">0</div></div>
+      <div class="blitz-stmt" id="stmt"></div><div class="big2"><button class="btn danger" id="f">← Неверно</button><button class="btn primary" id="t">Верно →</button></div><div id="fb" class="muted" style="min-height:1.6em"></div></section>`;
+    const paint=()=>{$("#stmt").innerHTML=`\\(${item.tex}\\)`;typeset($("#stmt"))};
+    nextItem();paint();
+    const answer=a=>{if(left<=0)return;n++;const right=a===item.ok;score+=right?1:-1;$("#bs").textContent=score;
+      $("#fb").innerHTML=right?`<span class="mark-ok">Верно</span>`:`<span class="mark-bad">${item.ok?"Эта формула верная":"Формула неверная"}</span>`;nextItem();paint()};
+    $("#t").addEventListener("click",()=>answer(true));$("#f").addEventListener("click",()=>answer(false));
+    const key=e=>{if(view!=="blitz"){document.removeEventListener("keydown",key);return}if(e.key==="ArrowRight")answer(true);if(e.key==="ArrowLeft")answer(false)};
+    document.addEventListener("keydown",key);
+    timers.push(setInterval(()=>{left--;const t=$("#bt");if(t){t.textContent=left;t.classList.toggle("low",left<=10)}if(left<=0){clearTimers();document.removeEventListener("keydown",key);finish()}},1000));
+    function finish(){const rec=score>ST.blitzBest;if(rec)ST.blitzBest=score;ST.blitzRuns++;touch();save();
+      V.innerHTML=`<section class="sheet"><div class="eyebrow">Блиц окончен</div><h2>${score} ${rec?"— новый рекорд":""}</h2><p style="margin:0">Ответов: ${n}. Рекорд: ${ST.blitzBest}.</p><div class="row"><button class="btn primary" id="go">Ещё раз</button><button class="btn ghost" id="toc">Учить формулы карточками</button></div></section>`;
+      $("#go").addEventListener("click",run);$("#toc").addEventListener("click",()=>show("cards"))}
+  }
+}
+
+/* ---------- Статистика ---------- */
+function Stats(){
+  const V=$("#view");
+  const tot=Object.values(ST.tasks).reduce((a,r)=>a+r.total,0),ok=Object.values(ST.tasks).reduce((a,r)=>a+r.ok,0);
+  const learned=F.filter(f=>cardState(f.id).box>=4).length;
+  const best=ST.variants.reduce((m,v)=>Math.max(m,v.score),0);
+  const rows=Array.from({length:12},(_,i)=>{const r=ST.tasks[i+1]||{ok:0,total:0};return{n:i+1,ok:r.ok,total:r.total,p:r.total?Math.round(r.ok/r.total*100):null}});
+  const weak=rows.filter(r=>r.total>=3).sort((a,b)=>a.p-b.p).slice(0,3);
+  V.innerHTML=`<section class="sheet">
+    <div class="eyebrow">Статистика хранится только в этом браузере</div>
+    <div class="tiles">
+      <div class="tile"><b>${tot}</b><span>заданий решено</span></div>
+      <div class="tile"><b>${tot?Math.round(ok/tot*100)+" %":"—"}</b><span>верных ответов</span></div>
+      <div class="tile"><b>${streak()}</b><span>дней подряд</span></div>
+      <div class="tile"><b>${learned}/${F.length}</b><span>формул выучено (коробка 4–5)</span></div>
+      <div class="tile"><b>${ST.blitzBest}</b><span>рекорд блица</span></div>
+      <div class="tile"><b>${ST.variants.length?best+"/12":"—"}</b><span>лучший вариант</span></div>
+    </div>
+    <div><h2 style="font-size:20px">Точность по номерам заданий</h2><p class="muted" style="margin:4px 0 0;font-size:14px">${tot?(weak.length?"Слабые места: "+weak.map(w=>"№"+w.n+" ("+w.p+" %)").join(", ")+".":"Решите хотя бы по 3 задания каждого номера, чтобы увидеть слабые места."):"Пока пусто. Решите несколько заданий во вкладке «Задания 1–12» или вариант целиком: здесь появятся столбцы по каждому номеру."}</p></div>
+    <div class="chart" id="chart"></div>
+    <details><summary>Показать таблицей</summary><div class="tw"><table><tr><th>№</th><th>Тема</th><th>Верно</th><th>Всего</th><th>Точность</th></tr>${rows.map(r=>`<tr><td>${r.n}</td><td>${TOPIC[r.n]}</td><td>${r.ok}</td><td>${r.total}</td><td>${r.p==null?"—":r.p+" %"}</td></tr>`).join("")}</table></div></details>
+    ${ST.variants.length?`<div><h2 style="font-size:20px">Варианты</h2><div class="tw"><table><tr><th>Дата</th><th>Баллы</th><th>Время</th></tr>${ST.variants.slice().reverse().slice(0,10).map(v=>`<tr><td>${v.d}</td><td>${v.score}/12</td><td>${Math.floor(v.secs/60)} мин</td></tr>`).join("")}</table></div></div>`:""}
+    <div class="row" id="reset"><button class="btn ghost" id="rs">Сбросить статистику</button></div>
+  </section>`;
+  drawChart(rows);
+  $("#rs").addEventListener("click",()=>{$("#reset").innerHTML=`<span>Удалить всю статистику и прогресс карточек?</span><button class="btn danger" id="yes">Удалить</button><button class="btn ghost" id="no">Отмена</button>`;
+    $("#yes").addEventListener("click",()=>{ST={tasks:{},days:[],cards:{},blitzBest:0,blitzRuns:0,variants:[],solved:0};save();Stats()});$("#no").addEventListener("click",Stats)});
+}
+function drawChart(rows){
+  const W=640,H=240,L=40,B=28,T=14,Rr=8,cw=(W-L-Rr)/12,bw=Math.min(30,cw-10);
+  const y=p=>T+(H-T-B)*(1-p/100);
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Точность по номерам заданий, проценты">`;
+  [0,50,100].forEach(v=>{s+=`<line x1="${L}" x2="${W-Rr}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/><text x="${L-8}" y="${y(v)+4}" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="11" fill="var(--muted)">${v}%</text>`});
+  rows.forEach((r,i)=>{const cx=L+cw*i+cw/2,x=cx-bw/2;
+    if(r.p==null){s+=`<rect x="${x}" y="${y(100)}" width="${bw}" height="${y(0)-y(100)}" fill="none" stroke="var(--line)" stroke-dasharray="3 3"/>`}
+    else{const top=y(r.p),h=Math.max(0,y(0)-top);const rad=Math.min(4,h);
+      s+=`<path d="M${x},${y(0)} V${top+rad} Q${x},${top} ${x+rad},${top} H${x+bw-rad} Q${x+bw},${top} ${x+bw},${top+rad} V${y(0)} Z" fill="var(--pen)"/>`;
+      if(r.total)s+=`<text x="${cx}" y="${top-5}" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="var(--ink)">${r.p}</text>`}
+    s+=`<text x="${cx}" y="${H-8}" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="var(--muted)">${r.n}</text>`;
+    s+=`<rect class="hit" data-i="${i}" x="${L+cw*i}" y="${T}" width="${cw}" height="${H-T-B}" fill="transparent"/>`});
+  s+=`<line x1="${L}" x2="${W-Rr}" y1="${y(0)}" y2="${y(0)}" stroke="var(--muted)" stroke-width="1"/></svg><div class="tip" id="tip" hidden></div>`;
+  const C=$("#chart");C.innerHTML=s;const tip=$("#tip");
+  C.querySelectorAll(".hit").forEach(h=>{const r=rows[+h.dataset.i];
+    const showT=()=>{const box=C.getBoundingClientRect(),hb=h.getBoundingClientRect();tip.hidden=false;tip.textContent=`№${r.n} · ${TOPIC[r.n]}: ${r.total?r.ok+" из "+r.total+" ("+r.p+" %)":"нет попыток"}`;tip.style.left=Math.min(Math.max(hb.left-box.left+hb.width/2,90),box.width-90)+"px";tip.style.top=(hb.top-box.top+20)+"px"};
+    h.addEventListener("mouseenter",showT);h.addEventListener("mouseleave",()=>tip.hidden=true);h.addEventListener("click",showT)});
+}
+
+let start="train";try{const t=localStorage.getItem(KEY+"-tab");if(t)start=t}catch(e){}
+show(start);
+window.__ege={GEN,genTask,F,WRONG};
+})();
+</script>
